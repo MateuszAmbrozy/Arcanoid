@@ -37,6 +37,7 @@ public:
     //FUNCSTIONS
     void resetGUI();
     void updateButtons();
+    void updateInput(const float& dt);
     void updateMute();
     void update(const float& dt);
     void renderButtons(sf::RenderTarget& target);
