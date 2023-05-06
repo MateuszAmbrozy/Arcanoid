@@ -19,3 +19,6 @@ Destroy all the blocks to complete the level.
 Catch power-ups to obtain special abilities.
 Don't let the ball hit the bottom of the screen or you will lose a life.
 Lose all lives and the game is over.
+
+## Images from game
+![image](https://user-images.githubusercontent.com/127397482/236650490-6d1485dc-d212-4d3b-b74e-c4f026b8e573.png)
