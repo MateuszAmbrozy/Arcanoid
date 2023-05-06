@@ -146,6 +146,9 @@ void MainMenuState::updateButtons()
 		this->endState();
 	}
 }
+void MainMenuState::updateInput(const float& dt)
+{
+}
 void MainMenuState::updateMute()
 {
 	if(this->mute.getGlobalBounds().contains(sf::Vector2f(this->mousePosWindow)) ||
