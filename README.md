@@ -22,3 +22,5 @@ Lose all lives and the game is over.
 
 ## Images from game
 ![image](https://user-images.githubusercontent.com/127397482/236650490-6d1485dc-d212-4d3b-b74e-c4f026b8e573.png)
+![image](https://user-images.githubusercontent.com/127397482/236650579-282fc063-1ba3-47b8-be30-7113ee2c4588.png)
+c
