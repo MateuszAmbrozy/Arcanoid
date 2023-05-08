@@ -7,7 +7,7 @@ The game includes animations and a menu system with multiple windows including a
 The game includes various types of blocks such as regular blocks with different hit points, indestructible blocks, and blocks with superpowers. There are also various types of superpowers that players can obtain such as changing paddle size, changing ball speed, adding extra balls, and reversing the paddle's movement.
 
 ## Dependencies
-To run this project, you do not need to have BOX2D nor SFML installed because it is included in Linkers folder
+To run this project, you do not need to have BOX2D nor SFML installed because they are included in Linkers folder
 ## Building and Running the Game
 Clone this repository.
 Open the project in your C++ IDE.
