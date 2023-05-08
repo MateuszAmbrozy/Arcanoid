@@ -2,7 +2,6 @@
 #include "Ball.h"
 
 //PRIVATE FUNCTIONS
-
 void Ball::initTexture(StateData* stateData, const float radious)
 {
 	this->shape.setRadius(radious);
@@ -14,7 +13,6 @@ void Ball::initTexture(StateData* stateData, const float radious)
 	this->shape.setOrigin(radious, radious);
 
 }
-
 void Ball::initbox2d(StateData* stateData, b2World* world, sf::Vector2f position, const float radious)
 {
 	m_bodyDef = new b2BodyDef();
@@ -41,7 +39,6 @@ void Ball::initbox2d(StateData* stateData, b2World* world, sf::Vector2f position
 	m_body->CreateFixture(m_fixtureDef);
 }
 
-
 //CONSTRUCTOR AND DESTRUCTOR
 Ball::Ball(StateData* stateData, b2World* world,  const Paddle* paddle, const float radious) //constructor for default ball
 	:vm(stateData->gfxSettings->resolution)
@@ -55,7 +52,7 @@ Ball::Ball(StateData* stateData, b2World* world,  const Paddle* paddle, const fl
 	this->shape.setPosition(position);
 
 	this->velocity = sf::Vector2f(static_cast<float>((std::rand() % 200) - 100) / 100.f, -1.f);
-	this->maxSpeed = static_cast<float>(gui::callCharSize(this->vm, 4.f));
+	this->maxSpeed = static_cast<float>(gui::callCharSize(this->vm, 2.5f));
 
 }
 Ball::Ball(StateData* stateData, b2World* world, const float radious, sf::Vector2f position) //constructor for ball made by superPowers
@@ -67,8 +64,8 @@ Ball::Ball(StateData* stateData, b2World* world, const float radious, sf::Vector
 	this->shape.setPosition(position);
 
 	this->velocity = sf::Vector2f(static_cast<float>((std::rand() % 200) - 100) / 100.f, -1.f);
-	this->maxSpeed = static_cast<float>(gui::callCharSize(vm, 4.f));
-	this->m_body->SetLinearVelocity(b2Vec2(velocity.x * maxSpeed * 0.015f * sssss, velocity.x * maxSpeed * 0.015f * sssss));
+	this->maxSpeed = static_cast<float>(gui::callCharSize(vm, 2.5f));
+	this->m_body->SetLinearVelocity(b2Vec2(velocity.x * maxSpeed * 0.02f * s, velocity.x * maxSpeed * 0.02f * s));
 }
 Ball::~Ball()
 {
@@ -77,6 +74,7 @@ Ball::~Ball()
 	delete this->m_shape;
 	delete this->userData;
 }
+
 //ACCESSORS
 const sf::Vector2i Ball::getGridPosition(const int gridWidth, const int gridHeight) const
 {
@@ -112,7 +110,6 @@ b2FixtureDef* Ball::GetFixtureDef()
 	return m_fixtureDef;
 }
 
-
 //MODIFIERS
 void Ball::setPosition(sf::Vector2f position)
 {
@@ -130,40 +127,34 @@ void Ball::setRotation(float rotation)
 	this->shape.setRotation(rotation);
 }
 
-
 //FUNCTIONS
 void Ball::move(const float dirX, const float dirY, const float& dt)
 {
-	this->m_body->SetLinearVelocity(b2Vec2(dirX * this->maxSpeed * dt  * sssss, dirY * this->maxSpeed * dt * sssss));
+	this->m_body->SetLinearVelocity(b2Vec2(dirX * this->maxSpeed * dt  * s, dirY * this->maxSpeed * dt * s));
 }
 void Ball::move(sf::Vector2f velocity, const float& dt)
 {
-	this->m_body->SetLinearVelocity(b2Vec2(velocity.x * this->maxSpeed * dt * sssss, velocity.y * this->maxSpeed * dt * sssss));
+	this->m_body->SetLinearVelocity(b2Vec2(velocity.x * this->maxSpeed * dt * s, velocity.y * this->maxSpeed * dt * s));
 }
 
 void Ball::update(const float& dt)
 {
-	/*if (std::abs(this->m_body->GetLinearVelocity().x) > maxSpeed * dt * sssss)
+	if (std::abs(this->m_body->GetLinearVelocity().x) >= maxSpeed * dt * s * 1.5f)
 	{
-		this->m_body->SetLinearVelocity(b2Vec2(this->m_body->GetLinearVelocity().x + ((this->m_body->GetLinearVelocity().x > 0.0f) ? -1.f : 1.f), m_body->GetLinearVelocity().y));
-		std::cout << "xxxxxx\n";
+		this->m_body->SetLinearVelocity(b2Vec2(this->m_body->GetLinearVelocity().x + ((this->m_body->GetLinearVelocity().x > 0.0f) ? -maxSpeed * dt : maxSpeed * dt), m_body->GetLinearVelocity().y));
 	}
-	if (std::abs(this->m_body->GetLinearVelocity().y) > maxSpeed * dt * sssss)
+	if (std::abs(this->m_body->GetLinearVelocity().y) >= maxSpeed * dt * s * 1.5f)
 	{
-		this->m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y + ((this->m_body->GetLinearVelocity().y > 0.0f) ? -1.f : 1.f)));
-		std::cout << "yyyyyy\n";
+		this->m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y + ((this->m_body->GetLinearVelocity().y > 0.0f) ? -maxSpeed * dt : maxSpeed * dt)));
 	}
-	*/
-	if (std::abs(m_body->GetLinearVelocity().x) < 5.f)
+	
+	if (std::abs(m_body->GetLinearVelocity().x) < maxSpeed * dt / 10.f && m_body->GetLinearVelocity().x != 0)
 	{
-		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x + (m_body->GetLinearVelocity().x < 0) ? -1.f : 1.f, m_body->GetLinearVelocity().y));
-		std::cout << "xxxxxx\n";
+		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x + (m_body->GetLinearVelocity().x < 0) ? -maxSpeed * dt : maxSpeed * dt, m_body->GetLinearVelocity().y));
 	}
-
-	if (std::abs(m_body->GetLinearVelocity().y) < 5.f)
+	if (std::abs(m_body->GetLinearVelocity().y) < maxSpeed * dt / 10.f && m_body->GetLinearVelocity().y != 0)
 	{
-		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y + (m_body->GetLinearVelocity().y < 0) ? -1.f : 1.f));
-		std::cout << "yyyyyy\n";
+		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y + (m_body->GetLinearVelocity().y < 0) ? -maxSpeed * dt : maxSpeed * dt));
 	}
 
 	shape.setRotation(m_body->GetAngle() * 180 / b2_pi);

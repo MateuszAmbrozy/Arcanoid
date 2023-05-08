@@ -87,7 +87,6 @@ public:
     //ACCESSRS
     std::vector<Ball*> getBalls();
 
-
     //FUNCSTIONS
     void updateInput(const float& dt);
     void updatePausedButtons();

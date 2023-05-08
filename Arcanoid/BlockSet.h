@@ -34,6 +34,7 @@ private:
 	sf::Texture tileTextureSheet;
 	sf::VideoMode vm;
 	sf::FloatRect overlap;
+
 	//ANIMATION VARIABLES
 	sf::Texture destTexture;
 	sf::Sprite destSprite;

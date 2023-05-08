@@ -1,18 +1,17 @@
 #pragma once
+
 //BOX2D
 #include <box2d.h>
+
 //SFML
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Audio.hpp>
 
-
-
 //CORE
 #include <Windows.h>
 #include <map>
-
 #include <string>
 #include <iostream>
 #include <cstdlib>
@@ -29,4 +28,4 @@
 #include<fstream>
 #include <cmath>
 
-#define sssss 20.f
+#define s 20.f

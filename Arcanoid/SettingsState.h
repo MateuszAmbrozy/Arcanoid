@@ -13,8 +13,6 @@ private:
 	sf::Texture bg;
 	sf::IntRect bgTextureRect[5];
 
-
-	
 	sf::Font font;
 	sf::Texture backgroundTexture;
 	sf::RectangleShape background;
@@ -37,7 +35,6 @@ private:
 
 	std::vector<sf::VideoMode> modes;
 	
-
 	//PRIVATE FUNCTIONS
 	void initVariables();
 	void initKeyBinds();
@@ -46,11 +43,10 @@ private:
 	void initTexts();
 	void initGui(StateData* stateData);
 public:
+
 	//CONSTRUCTOR AND DESTRUCTOR
 	SettingsState(StateData* stateData);
 	virtual ~SettingsState();
-
-	//ACCESSORS
 
 	//FUNCTIONS
 	void resetGui();

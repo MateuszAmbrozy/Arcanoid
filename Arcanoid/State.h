@@ -24,7 +24,6 @@ public:
 	
 	//Music
 	bool mute;
-
 	float musicVolume = 0;
 	float collisionVolume = 0;
 	float endVolume = 0;
@@ -58,8 +57,6 @@ public:
 	//CONSTRUCTOR AND DESTRUCTOR
 	State(StateData* stateData);
 	virtual ~State();
-
-	//ACCESSORS
 
 	//MODIFIERS
 	void pauseState();

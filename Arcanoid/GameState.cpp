@@ -29,13 +29,11 @@ void GameState::initB2WorldBounds()
 	b2Body* screenBorderBody = world->CreateBody(&screenBorderDef);
 	b2EdgeShape screenBorderShape;
 
-	// Create fixtures for the four borders (the border shape is re-used)
+	// Create fixtures for the three borders (the border shape is re-used)
 	screenBorderShape.SetTwoSided(lowerLeftCorner, lowerRightCorner);
 	screenBorderBody->CreateFixture(&screenBorderShape, 0);
 	screenBorderShape.SetTwoSided(lowerRightCorner, upperRightCorner);
 	screenBorderBody->CreateFixture(&screenBorderShape, 0);
-	//screenBorderShape.SetTwoSided(upperRightCorner, upperLeftCorner);
-	//screenBorderBody->CreateFixture(&screenBorderShape, 0);
 	screenBorderShape.SetTwoSided(upperLeftCorner, lowerLeftCorner);
 	screenBorderBody->CreateFixture(&screenBorderShape, 0);
 }
@@ -305,6 +303,8 @@ void GameState::updateInput(const float& dt)
 	else 
 		this->paddle->move(0.f, 0.f, dt);
 		
+	//this->paddle->GetBodyDef()->position.Set(this->mousePosWindow.x, paddle->getPosition().x);
+
 }
 void GameState::updatePausedButtons()
 {
@@ -455,16 +455,14 @@ void GameState::updateBall(const float& dt)
 					this->collisionSound.play();
 
 
-					// Oblicz offset pi³ki od lewego górnego rogu klocka
-				sf::Vector2f ballPos = balls[i]->getPosition();
-				sf::Vector2f paddlePos = paddle->getPosition() ;
-				float offsetX = ballPos.x - paddlePos.x + paddle->getGlobalBounds().width / 2.f;
+				// Oblicz offset pi³ki od lewego górnego rogu klocka
+				float offsetX = balls[i]->getPosition().x - balls[i]->getGlobalBounds().width / 2.f - paddle->getPosition().x + paddle->getGlobalBounds().width / 2.f;
 
 
 				// Calculate the angle of the ball's bounce
 				float angle = offsetX / paddle->getGlobalBounds().width;
 
-				// Increase the multiplier for the deflection factor if the ball hits the edge of the block
+				//// Increase the multiplier for the deflection factor if the ball hits the edge of the block
 				if (offsetX < 0 || offsetX > paddle->getSize().x)
 				{
 					angle *= 2.0f;
@@ -472,7 +470,7 @@ void GameState::updateBall(const float& dt)
 
 				// Calculate the velocity vector of the ball after bouncing
 				sf::Vector2f velocity;
-				velocity.x = balls[i]->GetBody()->GetLinearVelocity().x + 20 * angle;
+				velocity.x = balls[i]->GetBody()->GetLinearVelocity().x + angle * std::abs(balls[i]->GetBody()->GetLinearVelocity().x) / 2;
 				velocity.y = balls[i]->GetBody()->GetLinearVelocity().y;
 				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(velocity.x, velocity.y));
 				std::cout << angle << std::endl;
@@ -514,7 +512,7 @@ void GameState::updateInverseTimer()
 }
 void GameState::update(const float& dt)
 {
-	this->world->Step(1 / 60.f / sssss, 8, 3);
+	this->world->Step(1 / 60.f / s, 8, 3);
 	this->updateMousePosition();
 	if(!this->blockSet->checkEndGame() && this->lifeCounter > 0)
 	{

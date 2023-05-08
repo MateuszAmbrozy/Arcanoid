@@ -16,9 +16,6 @@ void ContactListener::BeginContact(b2Contact* contact)
     auto bodyA = contact->GetFixtureA()->GetBody();
     auto bodyB = contact->GetFixtureB()->GetBody();
 
-    //BallUserData* userDataA = reinterpret_cast<BallUserData*>(bodyA->GetUserData().pointer);
-   // BallUserData* userDataB = reinterpret_cast<BallUserData*>(bodyB->GetUserData().pointer);
-
     UserData* userDataA = (UserData*)fixtureA->GetUserData().pointer;
     UserData* userDataB = (UserData*)fixtureB->GetUserData().pointer;
     if (userDataA && userDataB)
@@ -46,11 +43,8 @@ void ContactListener::BeginContact(b2Contact* contact)
 }
 void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
 {
-    b2Fixture* fixtureA = contact->GetFixtureA();
-    b2Fixture* fixtureB = contact->GetFixtureB();
-
-    UserData* userDataA = (UserData*)fixtureA->GetUserData().pointer;
-    UserData* userDataB = (UserData*)fixtureB->GetUserData().pointer;
+    UserData* userDataA = (UserData*)contact->GetFixtureA()->GetUserData().pointer;
+    UserData* userDataB = (UserData*)contact->GetFixtureB()->GetUserData().pointer;
 
     if (userDataA && userDataB)
     {

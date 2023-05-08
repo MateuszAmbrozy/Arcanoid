@@ -148,14 +148,15 @@ void EditorState::updateEditorInput(const float& dt)
 	
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("INCREASE_TYPE"))) && this->getKeyTime())
 	{
-		this->type++;
+		if(this->type < 2)
+			this->type++;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("DECREASE_TYPE"))) && this->getKeyTime())
 	{
 		if (this->type > 0)
 			this->type--;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("INCREASE_LIFE"))) && this->getKeyTime() && this->lifes < 6 )
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("INCREASE_LIFE"))) && this->getKeyTime() && this->lifes < 5 )
 	{
 		this->lifes++;
 	}
@@ -178,13 +179,13 @@ void EditorState::updateGUI()
 	this->selectorRect.setTextureRect(this->textureRect);
 
 	std::stringstream ss;
-	this->cursorText.setPosition(static_cast<float>(this->mousePosWindow.x), static_cast<float>(this->mousePosWindow.y) - 50.f);
+	this->cursorText.setPosition(static_cast<float>(this->mousePosWindow.x) + 50.f, static_cast<float>(this->mousePosWindow.y) - 50.f);
 
 	ss << this->mousePosWindow.x << " " << this->mousePosWindow.y << "\n "
 		<< this->mousePosGrid.x << " " << this->mousePosGrid.y << "\n "
 		<< this->textureRect.left << " " << this->textureRect.top << "\n "
-		<< "Type: " << this->type << "\n"
-		<< "Lifes: " << this->lifes << "\n";
+		<< "Type: " << this->type + 1 << "\n"
+		<< "Lifes: " << this->lifes + 1 << "\n";
 
 	this->cursorText.setString(ss.str());
 }

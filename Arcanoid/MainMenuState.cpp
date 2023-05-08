@@ -103,6 +103,7 @@ MainMenuState::~MainMenuState()
 }
 
 //FUNCTIONS
+
 void MainMenuState::resetGUI()
 {
 	/*
@@ -145,6 +146,9 @@ void MainMenuState::updateButtons()
 	{
 		this->endState();
 	}
+}
+void MainMenuState::updateInput(const float& dt)
+{
 }
 void MainMenuState::updateMute()
 {

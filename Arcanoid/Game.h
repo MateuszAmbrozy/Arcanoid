@@ -1,6 +1,7 @@
 #pragma once
 #include "GraphicsSettings.h"
 #include "MainMenuState.h"
+
 class Game
 {
 private:
@@ -29,9 +30,7 @@ private:
 	void initStates();
 	void initWindow();
 	void initGraphicsSettings();
-
 public:
-
 	//CONSTRUCTOR AND DESTRUCTOR
 	Game();
 	virtual ~Game();
@@ -40,8 +39,6 @@ public:
 	void run();
 	void pollEvents();
 	void updateDT();
-
-
 	void update();
 	void render();
 };

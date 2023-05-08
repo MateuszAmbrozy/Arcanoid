@@ -16,7 +16,6 @@ private:
     PausedMenu* pausedMenu;
     gui::TextureSelector* textureSelector;
 
-
     sf::RectangleShape selectorRect;
     sf::IntRect textureRect;
     sf::VideoMode vm;

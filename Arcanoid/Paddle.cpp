@@ -211,7 +211,7 @@ void Paddle::setBodySize()
 //FUNCTIONS
 void Paddle::move(const float dirX, const float dirY, const float& dt)
 {	
-	this->m_body->SetLinearVelocity(b2Vec2(dirX * this->maxVelocity * dt * sssss, dirY * this->maxVelocity * dt * sssss));
+	this->m_body->SetLinearVelocity(b2Vec2(dirX * this->maxVelocity * dt * s, dirY * this->maxVelocity * dt * s));
 }
 void Paddle::updateWorldBoundsCollision()
 {

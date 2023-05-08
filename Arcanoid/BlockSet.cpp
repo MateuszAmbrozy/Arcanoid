@@ -239,7 +239,6 @@ void BlockSet::collisionBallBlock(StateData* stateData, std::vector<Ball*> balls
 		}
 	}
 }
-
 void BlockSet::addBlock(const int x, const int y, int lifes,
 	const sf::IntRect& textureRect, const short& type)
 {
@@ -251,7 +250,6 @@ void BlockSet::addBlock(const int x, const int y, int lifes,
 	}
 
 }
-
 void BlockSet::removeBlock(const int x, const int y)
 {
 	if (x < this->maxSizeWorldGrid.x && x >= 0 &&
@@ -349,7 +347,6 @@ void BlockSet::loadFromFile(const std::string fileName, b2World* world)
 
 	in_file.close();
 }
-
 void BlockSet::startSuperPower(StateData* stateData, Paddle* paddle, std::vector<Ball*>* balls)
 {
 	for (int i = 0; i < this->powers.size(); i++)
@@ -398,13 +395,10 @@ void BlockSet::updateSuperPower(StateData* stateData, const float& dt)
 		power->update(dt);
 	}
 }
-
-
 void BlockSet::update()
 {
 	this->blocks.resize(this->maxSizeWorldGrid.x, std::vector<Block*>(maxSizeWorldGrid.y));
 }
-
 void BlockSet::render(sf::RenderTarget& target)
 {
 	if (doAnimation)

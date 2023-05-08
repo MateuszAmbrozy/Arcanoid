@@ -30,7 +30,7 @@ const float gui::p2pY(const float perc, const sf::VideoMode& vm)
 	else
 		throw("DIVISTION BY ZERO\n");
 }
-const unsigned gui::callCharSize(const sf::VideoMode& vm, const unsigned modifier)
+const unsigned gui::callCharSize(const sf::VideoMode& vm, const float modifier)
 {
 	/*
 	* Calculates the charater size for text using the current resolution nd a constant.

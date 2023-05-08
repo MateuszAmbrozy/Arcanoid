@@ -6,9 +6,7 @@ class Paddle
 {
 private:
 	sf::Texture texture;
-
 	sf::IntRect textureRect;
-
 	sf::RectangleShape shape;
 	float width;
 	float height;
