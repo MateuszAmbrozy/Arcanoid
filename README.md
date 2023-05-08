@@ -22,10 +22,10 @@ Lose all lives and the game is over.
 
 ## Link to youtube
 https://www.youtube.com/watch?v=lwKxcI6P4SY&ab_channel=MatiHere
-
+[![Watch the video](/images/content/4279611/690cc1ce1c97ed83c883846f84451ad3.png)](https://www.youtube.com/watch?v=lwKxcI6P4SY&ab_channel=MatiHere)
 ## Images from game
-Game State
+**Game State**
 ![image](https://user-images.githubusercontent.com/127397482/236650490-6d1485dc-d212-4d3b-b74e-c4f026b8e573.png)
-Editor State
-![image](https://user-images.githubusercontent.com/127397482/236650579-282fc063-1ba3-47b8-be30-7113ee2c4588.png)
+**Editor State**
+![image](https://user-images.githubusercontent.com/127397482/236909465-82be66a4-17ac-48ea-8914-83572ccd3cd0.png)
 
