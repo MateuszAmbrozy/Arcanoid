@@ -21,8 +21,7 @@ Don't let the ball hit the bottom of the screen or you will lose a life.
 Lose all lives and the game is over.
 
 ## Link to youtube
-https://www.youtube.com/watch?v=lwKxcI6P4SY&ab_channel=MatiHere
-[![Watch the video](/images/content/4279611/690cc1ce1c97ed83c883846f84451ad3.png)](https://www.youtube.com/watch?v=lwKxcI6P4SY&ab_channel=MatiHere)
+[![Watch the video](/Arcanoid/Resources/Background/bg1.png)](https://www.youtube.com/watch?v=lwKxcI6P4SY&ab_channel=MatiHere)
 ## Images from game
 **Game State**
 ![image](https://user-images.githubusercontent.com/127397482/236650490-6d1485dc-d212-4d3b-b74e-c4f026b8e573.png)
