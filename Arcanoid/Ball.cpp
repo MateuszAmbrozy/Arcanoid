@@ -139,20 +139,20 @@ void Ball::move(sf::Vector2f velocity, const float& dt)
 
 void Ball::update(const float& dt)
 {
-	if (std::abs(this->m_body->GetLinearVelocity().x) >= maxSpeed * dt * s * 1.5f)
+	if (std::abs(this->m_body->GetLinearVelocity().x) >= maxSpeed * dt * s * 3.f)
 	{
 		this->m_body->SetLinearVelocity(b2Vec2(this->m_body->GetLinearVelocity().x + ((this->m_body->GetLinearVelocity().x > 0.0f) ? -maxSpeed * dt : maxSpeed * dt), m_body->GetLinearVelocity().y));
 	}
-	if (std::abs(this->m_body->GetLinearVelocity().y) >= maxSpeed * dt * s * 1.5f)
+	if (std::abs(this->m_body->GetLinearVelocity().y) >= maxSpeed * dt * s * 3.f)
 	{
 		this->m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y + ((this->m_body->GetLinearVelocity().y > 0.0f) ? -maxSpeed * dt : maxSpeed * dt)));
 	}
 	
-	if (std::abs(m_body->GetLinearVelocity().x) < maxSpeed * dt / 10.f && m_body->GetLinearVelocity().x != 0)
+	if (std::abs(m_body->GetLinearVelocity().x) < maxSpeed * dt / 5.f)
 	{
 		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x + (m_body->GetLinearVelocity().x < 0) ? -maxSpeed * dt : maxSpeed * dt, m_body->GetLinearVelocity().y));
 	}
-	if (std::abs(m_body->GetLinearVelocity().y) < maxSpeed * dt / 10.f && m_body->GetLinearVelocity().y != 0)
+	if (std::abs(m_body->GetLinearVelocity().y) < maxSpeed * dt / 5.f)
 	{
 		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y + (m_body->GetLinearVelocity().y < 0) ? -maxSpeed * dt : maxSpeed * dt));
 	}

@@ -456,7 +456,7 @@ void GameState::updateBall(const float& dt)
 
 
 				// Oblicz offset pi³ki od lewego górnego rogu klocka
-				float offsetX = balls[i]->getPosition().x - balls[i]->getGlobalBounds().width / 2.f - paddle->getPosition().x + paddle->getGlobalBounds().width / 2.f;
+				float offsetX = balls[i]->getPosition().x - (paddle->getPosition().x + paddle->getGlobalBounds().width / 2.f);
 
 
 				// Calculate the angle of the ball's bounce
@@ -470,12 +470,13 @@ void GameState::updateBall(const float& dt)
 
 				// Calculate the velocity vector of the ball after bouncing
 				sf::Vector2f velocity;
-				velocity.x = balls[i]->GetBody()->GetLinearVelocity().x + angle * std::abs(balls[i]->GetBody()->GetLinearVelocity().x) / 2;
+				velocity.x = balls[i]->GetBody()->GetLinearVelocity().x + angle * std::abs(balls[i]->GetBody()->GetLinearVelocity().x);
 				velocity.y = balls[i]->GetBody()->GetLinearVelocity().y;
 				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(velocity.x, velocity.y));
-				std::cout << angle << std::endl;
+				std::cout << velocity.x << std::endl;
+				ballData->hit = false;
 			}
-			ballData->hit = false;
+			
 
 			if (balls[i]->GetBody()->GetPosition().y * SCALE >= this->stateData->gfxSettings->resolution.height)
 			{
