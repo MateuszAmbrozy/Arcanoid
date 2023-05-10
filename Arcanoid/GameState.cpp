@@ -172,7 +172,7 @@ GameState::GameState(StateData* stateData, std::string filename)
 {
 	this->initVariables();
 	this->initB2World();
-	this->initB2WorldBounds();
+	//this->initB2WorldBounds();
 	this->initContactListener();
 	this->initFont();
 	this->initKeyBinds();
@@ -255,8 +255,9 @@ void GameState::updateInput(const float& dt)
 			}
 		}
 	}
-
-			
+	//MOUSE
+	//if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	//	this->paddle->GetBody()->SetTransform(b2Vec2(/*this->mousePosWindow.x + this->paddle->getSize().x / 2.f) / SCALE*/0, (this->stateData->gfxSettings->resolution.height - gui::p2pY(9.25f, stateData->gfxSettings->resolution) / SCALE)), 0);
 	
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("MOVE_LEFT")))
 		&& !sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("MOVE_RIGHT"))))
@@ -303,8 +304,7 @@ void GameState::updateInput(const float& dt)
 	else 
 		this->paddle->move(0.f, 0.f, dt);
 		
-	//this->paddle->GetBodyDef()->position.Set(this->mousePosWindow.x, paddle->getPosition().x);
-
+	
 }
 void GameState::updatePausedButtons()
 {
@@ -444,6 +444,27 @@ void GameState::updateBall(const float& dt)
 			if (balls[i]->GetBody()->GetLinearVelocity().x == 0 && balls[i]->GetBody()->GetLinearVelocity().y == 0)
 				balls[i]->move(balls[i]->velocity.x, balls[i]->velocity.y, dt);
 
+
+
+			if (balls[i]->GetBody()->GetPosition().x * SCALE + balls[i]->getGlobalBounds().width / 2.f >= this->stateData->gfxSettings->resolution.width)
+			{
+				balls[i]->GetBody()->SetTransform(b2Vec2((this->stateData->gfxSettings->resolution.width - balls[i]->getGlobalBounds().width / 2.f) / SCALE, balls[i]->GetBody()->GetPosition().y), 0);
+
+				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(-balls[i]->GetBody()->GetLinearVelocity().x, balls[i]->GetBody()->GetLinearVelocity().y));
+
+			}
+
+			else if (balls[i]->GetBody()->GetPosition().x * SCALE - balls[i]->getGlobalBounds().width / 2.f <= 0)
+			{
+				balls[i]->GetBody()->SetTransform(b2Vec2(balls[i]->getGlobalBounds().width / 2.f / SCALE, balls[i]->GetBody()->GetPosition().y), 0);
+				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(-balls[i]->GetBody()->GetLinearVelocity().x, balls[i]->GetBody()->GetLinearVelocity().y));
+
+			}
+
+
+			if (balls[i]->GetBody()->GetPosition().y * SCALE - balls[i]->getGlobalBounds().height / 2.f <= 0)
+				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(balls[i]->GetBody()->GetLinearVelocity().x, -balls[i]->GetBody()->GetLinearVelocity().y));
+
 			
 
 			this->balls[i]->update(dt);
@@ -468,12 +489,10 @@ void GameState::updateBall(const float& dt)
 					angle *= 2.0f;
 				}
 
-				// Calculate the velocity vector of the ball after bouncing
-				sf::Vector2f velocity;
-				velocity.x = balls[i]->GetBody()->GetLinearVelocity().x + angle * std::abs(balls[i]->GetBody()->GetLinearVelocity().x);
-				velocity.y = balls[i]->GetBody()->GetLinearVelocity().y;
-				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(velocity.x, velocity.y));
-				std::cout << velocity.x << std::endl;
+				balls[i]->GetBody()->SetLinearVelocity(
+					b2Vec2(
+						balls[i]->GetBody()->GetLinearVelocity().x + (angle * std::abs(balls[i]->GetBody()->GetLinearVelocity().x * 5)),
+						balls[i]->GetBody()->GetLinearVelocity().y - 1));
 				ballData->hit = false;
 			}
 			
@@ -495,6 +514,8 @@ void GameState::updateBall(const float& dt)
 					this->balls.push_back(new Ball(this->stateData, this->world, this->paddle, gui::p2pX(1.4f, this->vm)));
 				}
 			}
+
+
 		}
 
 	}

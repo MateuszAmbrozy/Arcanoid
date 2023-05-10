@@ -59,7 +59,7 @@ void Paddle::initBox2D(b2World* world)
 Paddle::Paddle(StateData* stateData, b2World* world)
 	:vm(stateData->gfxSettings->resolution)
 {
-	this->width = gui::p2pX(10.7f, stateData->gfxSettings->resolution);
+	this->width = gui::p2pX(20.7f, stateData->gfxSettings->resolution);
 	this->height = gui::p2pY(2.7f, stateData->gfxSettings->resolution);
 	this->initTexture(stateData);
 

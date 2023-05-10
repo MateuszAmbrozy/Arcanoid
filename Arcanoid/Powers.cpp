@@ -8,12 +8,17 @@ Powers::Powers(StateData* stateData,  sf::Vector2f position)
 	this->maxVelocity = static_cast<float>(gui::callCharSize(stateData->gfxSettings->resolution, 15));
 
 	this->shape.setPosition(position);
-	this->powerType =  std::rand()%7;	
+	this->powerType =  std::rand()%7;
+	if(powerType == this->powerType == 1 || this->powerType == 5 || this->powerType == 6)
+		this->powerType = std::rand() % 7;
+
 	if(this->powerType == 2 || this->powerType == 3)
 	{
 		if (!this->texture[1].loadFromFile("Resources/Sprites/ballsPower.png"))
 			std::cout << "ERROR::TEXTURE::LOADFROMFILE::Could not load power.bmp" << std::endl;
 		this->shape.setTexture(&this->texture[1]);
+		shape.setOutlineColor(sf::Color::Green);
+		shape.setOutlineThickness(-1.f);
 	}
 	else if (this->powerType == 1 || this->powerType == 5 || this->powerType == 6)
 	{
@@ -27,7 +32,7 @@ Powers::Powers(StateData* stateData,  sf::Vector2f position)
 			std::cout << "ERROR::TEXTURE::LOADFROMFILE::Could not load power.bmp" << std::endl;
 		this->shape.setTexture(&this->texture[0]);
 	}
-	this->shape.setSize(sf::Vector2f(gui::p2pX(3.9f, this->vm), gui::p2pX(3.9f, this->vm)));
+	this->shape.setRadius(gui::p2pX(1.8f, this->vm));
 }
 Powers::~Powers()
 {

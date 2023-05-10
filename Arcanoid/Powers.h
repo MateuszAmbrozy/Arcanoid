@@ -9,7 +9,7 @@ class Powers
 private:
 	sf::Texture texture[3];
 
-	sf::RectangleShape shape;
+	sf::CircleShape shape;
 	float maxVelocity;
 	short unsigned powerType;
 	sf::VideoMode vm;

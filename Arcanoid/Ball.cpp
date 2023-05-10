@@ -55,6 +55,7 @@ Ball::Ball(StateData* stateData, b2World* world,  const Paddle* paddle, const fl
 	this->maxSpeed = static_cast<float>(gui::callCharSize(this->vm, 2.5f));
 
 }
+
 Ball::Ball(StateData* stateData, b2World* world, const float radious, sf::Vector2f position) //constructor for ball made by superPowers
 	:vm(stateData->gfxSettings->resolution)
 {
@@ -65,7 +66,7 @@ Ball::Ball(StateData* stateData, b2World* world, const float radious, sf::Vector
 
 	this->velocity = sf::Vector2f(static_cast<float>((std::rand() % 200) - 100) / 100.f, -1.f);
 	this->maxSpeed = static_cast<float>(gui::callCharSize(vm, 2.5f));
-	this->m_body->SetLinearVelocity(b2Vec2(velocity.x * maxSpeed * 0.02f * s, velocity.x * maxSpeed * 0.02f * s));
+	this->m_body->SetLinearVelocity(b2Vec2(velocity.x * maxSpeed * 0.01f * s, velocity.x * maxSpeed * 0.01f * s));
 }
 Ball::~Ball()
 {
@@ -139,22 +140,22 @@ void Ball::move(sf::Vector2f velocity, const float& dt)
 
 void Ball::update(const float& dt)
 {
-	if (std::abs(this->m_body->GetLinearVelocity().x) >= maxSpeed * dt * s * 3.f)
+	if (std::abs(this->m_body->GetLinearVelocity().x) >= maxSpeed * dt * s * 2.f)
 	{
-		this->m_body->SetLinearVelocity(b2Vec2(this->m_body->GetLinearVelocity().x + ((this->m_body->GetLinearVelocity().x > 0.0f) ? -maxSpeed * dt : maxSpeed * dt), m_body->GetLinearVelocity().y));
+		this->m_body->SetLinearVelocity(b2Vec2(this->m_body->GetLinearVelocity().x + ((this->m_body->GetLinearVelocity().x > 0.0f) ? -this->maxSpeed * dt : this->maxSpeed * dt), m_body->GetLinearVelocity().y));
 	}
-	if (std::abs(this->m_body->GetLinearVelocity().y) >= maxSpeed * dt * s * 3.f)
+	if (std::abs(this->m_body->GetLinearVelocity().y) >= maxSpeed * dt * s * 2.f)
 	{
-		this->m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y + ((this->m_body->GetLinearVelocity().y > 0.0f) ? -maxSpeed * dt : maxSpeed * dt)));
+		this->m_body->SetLinearVelocity(b2Vec2(this->m_body->GetLinearVelocity().x, this->m_body->GetLinearVelocity().y + ((this->m_body->GetLinearVelocity().y > 0.0f) ? -this->maxSpeed * dt : this->maxSpeed * dt)));
 	}
 	
-	if (std::abs(m_body->GetLinearVelocity().x) < maxSpeed * dt / 5.f)
+	if (std::abs(m_body->GetLinearVelocity().x) < maxSpeed * dt * 19)
 	{
-		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x + (m_body->GetLinearVelocity().x < 0) ? -maxSpeed * dt : maxSpeed * dt, m_body->GetLinearVelocity().y));
+		m_body->ApplyForce(b2Vec2(m_body->GetLinearVelocity().x + (m_body->GetLinearVelocity().x < 0) ? -maxSpeed * dt : maxSpeed * dt, m_body->GetLinearVelocity().y), m_body->GetWorldCenter(), true);
 	}
-	if (std::abs(m_body->GetLinearVelocity().y) < maxSpeed * dt / 5.f)
+	if (std::abs(m_body->GetLinearVelocity().y) < maxSpeed * dt * 19)
 	{
-		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y + (m_body->GetLinearVelocity().y < 0) ? -maxSpeed * dt : maxSpeed * dt));
+		m_body->ApplyForce(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y + (m_body->GetLinearVelocity().y < 0) ? -maxSpeed * dt : maxSpeed * dt), m_body->GetWorldCenter(), true);
 	}
 
 	shape.setRotation(m_body->GetAngle() * 180 / b2_pi);
