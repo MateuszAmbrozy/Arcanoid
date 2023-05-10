@@ -33,7 +33,6 @@ public:
 
 	/////////ACCESSORS////////////
 	const sf::Vector2i getGridPosition(const int gridWidth, const int gridHeight) const;
-	const sf::Vector2f& getVelocity() const;
 	const sf::Vector2f getPosition() const;
 	const sf::FloatRect getGlobalBounds() const;
 

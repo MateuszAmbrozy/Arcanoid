@@ -55,7 +55,6 @@ Ball::Ball(StateData* stateData, b2World* world,  const Paddle* paddle, const fl
 	this->maxSpeed = static_cast<float>(gui::callCharSize(this->vm, 2.5f));
 
 }
-
 Ball::Ball(StateData* stateData, b2World* world, const float radious, sf::Vector2f position) //constructor for ball made by superPowers
 	:vm(stateData->gfxSettings->resolution)
 {
@@ -83,10 +82,6 @@ const sf::Vector2i Ball::getGridPosition(const int gridWidth, const int gridHeig
 		static_cast<int>(this->shape.getPosition().x) / gridWidth,
 		static_cast<int>(this->shape.getPosition().y) / gridHeight
 	);
-}
-const sf::Vector2f& Ball::getVelocity() const
-{
-	return this->velocity;
 }
 const sf::Vector2f Ball::getPosition() const
 {
@@ -149,14 +144,12 @@ void Ball::update(const float& dt)
 		this->m_body->SetLinearVelocity(b2Vec2(this->m_body->GetLinearVelocity().x, this->m_body->GetLinearVelocity().y + ((this->m_body->GetLinearVelocity().y > 0.0f) ? -this->maxSpeed * dt : this->maxSpeed * dt)));
 	}
 	
-	if (std::abs(m_body->GetLinearVelocity().x) < maxSpeed * dt * 10)
+	if (std::abs(m_body->GetLinearVelocity().x) < maxSpeed * dt * 5)
 	{
-		//m_body->ApplyForce(b2Vec2((m_body->GetLinearVelocity().x < 0) ? -maxSpeed * dt : maxSpeed * dt, 0), m_body->GetWorldCenter(), true);
 		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x * 1.2f, m_body->GetLinearVelocity().y));
 	}
-	if (std::abs(m_body->GetLinearVelocity().y) < maxSpeed * dt * 10)
+	if (std::abs(m_body->GetLinearVelocity().y) < maxSpeed * dt * 5)
 	{
-		//m_body->ApplyForce(b2Vec2(0, (m_body->GetLinearVelocity().y < 0) ? -maxSpeed * dt : maxSpeed * dt), m_body->GetWorldCenter(), true);
 		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y* 1.2f));
 
 	}
