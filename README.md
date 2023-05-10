@@ -1,5 +1,6 @@
-
 ## Breakout Game with SFML and Box2D
+## Video
+[![Watch the video](/Arcanoid/Resources/Background/miniature.png)](https://youtu.be/KpI6gExv4bk)<br>
 This project is a Breakout game built with C++ using SFML and Box2D libraries. <br>
 The game features object-oriented programming concepts such as polymorphism, <br>
 abstract classes, namespaces, and inheritance. Box2D is used for collision detection and physics simulation.<br>
@@ -26,11 +27,13 @@ Catch power-ups to obtain special abilities.<br>
 Don't let the ball hit the bottom of the screen or you will lose a life.<br>
 Lose all lives and the game is over.<br>
 
-## Link to youtube
-[![Watch the video](/Arcanoid/Resources/Background/miniature.png)](https://youtu.be/KpI6gExv4bk)
-## Images from game
-**Game State**
-![image](https://user-images.githubusercontent.com/127397482/236650490-6d1485dc-d212-4d3b-b74e-c4f026b8e573.png)
-**Editor State**
-![image](https://user-images.githubusercontent.com/127397482/236909465-82be66a4-17ac-48ea-8914-83572ccd3cd0.png)
 
+## Images from game
+**MainMenuState**<br>
+![mainMenuState](https://github.com/MateuszAmbrozy/Arcanoid/assets/127397482/fca691d3-7201-42bb-bebf-2decbd1aabe6)<br>
+**SettingsState**<br>
+![SettingState](https://github.com/MateuszAmbrozy/Arcanoid/assets/127397482/a8046796-5691-4d92-ac92-f1ffb6b6a48b)<br>
+**Game State**<br>
+![GameState](https://github.com/MateuszAmbrozy/Arcanoid/assets/127397482/993aa34e-a171-4932-ba1d-01d975433698)<br>
+**Editor State**<br>
+![EditorState](https://github.com/MateuszAmbrozy/Arcanoid/assets/127397482/4d7074cb-e7c2-4ec1-831d-e3bc8267103c)<br>
