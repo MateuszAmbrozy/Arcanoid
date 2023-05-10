@@ -10,12 +10,9 @@ private:
 	sf::RectangleShape shape;
 	float width;
 	float height;
-	sf::Vector2f velocity;
 	sf::VideoMode vm;
 	sf::Vector2f position;
 	float maxVelocity;
-
-
 
 	//box2d variables
 	b2Body* m_body;
@@ -36,7 +33,6 @@ public:
 	const sf::Vector2f getPosition() const;
 	const sf::FloatRect getGlobalBounds() const;
 	const sf::Vector2f getSize() const;
-	const sf::Vector2f getVelocity() const;
 
 	//box2d accessors
 	b2BodyDef* GetBodyDef();

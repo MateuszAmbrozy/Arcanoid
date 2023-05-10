@@ -257,8 +257,6 @@ void BlockSet::removeBlock(const int x, const int y)
 		if (this->blocks[x][y] != nullptr)
 		{
 			this->blocks[x][y] = nullptr;
-			//blocks[x].erase(blocks[x].begin() + y + x * maxSizeWorldGrid.y);
-			//USUWANIE?//////////////////////
 		}
 
 	}

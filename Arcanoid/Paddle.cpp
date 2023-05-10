@@ -67,8 +67,6 @@ Paddle::Paddle(StateData* stateData, b2World* world)
 	this->shape.setPosition(this->position);
 	this->initBox2D(world);
 
-	this->velocity = sf::Vector2f(0.f, 0.f);
-
 	this->maxVelocity = static_cast<float>(gui::callCharSize(stateData->gfxSettings->resolution, 1.f));
 }
 Paddle::~Paddle()
@@ -91,10 +89,6 @@ const sf::FloatRect Paddle::getGlobalBounds() const
 const sf::Vector2f Paddle::getSize() const
 {
 	return sf::Vector2f(width, height);
-}
-const sf::Vector2f Paddle::getVelocity() const
-{
-	return this->velocity;
 }
 
 //box2d accessors
