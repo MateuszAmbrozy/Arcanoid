@@ -149,13 +149,16 @@ void Ball::update(const float& dt)
 		this->m_body->SetLinearVelocity(b2Vec2(this->m_body->GetLinearVelocity().x, this->m_body->GetLinearVelocity().y + ((this->m_body->GetLinearVelocity().y > 0.0f) ? -this->maxSpeed * dt : this->maxSpeed * dt)));
 	}
 	
-	if (std::abs(m_body->GetLinearVelocity().x) < maxSpeed * dt * 19)
+	if (std::abs(m_body->GetLinearVelocity().x) < maxSpeed * dt * 10)
 	{
-		m_body->ApplyForce(b2Vec2(m_body->GetLinearVelocity().x + (m_body->GetLinearVelocity().x < 0) ? -maxSpeed * dt : maxSpeed * dt, m_body->GetLinearVelocity().y), m_body->GetWorldCenter(), true);
+		//m_body->ApplyForce(b2Vec2((m_body->GetLinearVelocity().x < 0) ? -maxSpeed * dt : maxSpeed * dt, 0), m_body->GetWorldCenter(), true);
+		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x * 1.2f, m_body->GetLinearVelocity().y));
 	}
-	if (std::abs(m_body->GetLinearVelocity().y) < maxSpeed * dt * 19)
+	if (std::abs(m_body->GetLinearVelocity().y) < maxSpeed * dt * 10)
 	{
-		m_body->ApplyForce(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y + (m_body->GetLinearVelocity().y < 0) ? -maxSpeed * dt : maxSpeed * dt), m_body->GetWorldCenter(), true);
+		//m_body->ApplyForce(b2Vec2(0, (m_body->GetLinearVelocity().y < 0) ? -maxSpeed * dt : maxSpeed * dt), m_body->GetWorldCenter(), true);
+		m_body->SetLinearVelocity(b2Vec2(m_body->GetLinearVelocity().x, m_body->GetLinearVelocity().y* 1.2f));
+
 	}
 
 	shape.setRotation(m_body->GetAngle() * 180 / b2_pi);

@@ -334,28 +334,27 @@ void GameState::updateEndGameButtons()
 		this->stateData->refreshLevelState = true;
 		fileName = std::to_string(numMap);
 		fileName += ".slmp";
-		//std::cout << fileName << std::endl;
-		balls.clear();
-		balls.resize(0);
 
-		this->paddle = nullptr;
+		this->world->DestroyBody(this->paddle->GetBody());
+		delete this->paddle;
 		this->initPaddle();
 
+		for(auto& ball : this->balls)
+			this->world->DestroyBody(ball->GetBody());
+		this->balls.clear();
 		this->initBalls();
 
-		lifes.clear();
-		lifes.resize(0);
+		this->lifes.clear();
 		this->lifeCounter = 3;
 		this->initLifes();
 
-		this->blockSet = nullptr;
-		this->blockSet = new BlockSet(this->stateData, this->world, fileName, this->stateData->gridWidth, this->stateData->gridHeight);
+		delete this->blockSet;
 		this->initBlockSet(fileName);
 
-		this->timer = nullptr;
+		delete this->timer;
 		this->initTimer();
 
-		this->win = nullptr;
+		delete this->win;
 		this->initEndGame();
 
 		if(!this->stateData->mute)
@@ -443,31 +442,37 @@ void GameState::updateBall(const float& dt)
 		{
 			if (balls[i]->GetBody()->GetLinearVelocity().x == 0 && balls[i]->GetBody()->GetLinearVelocity().y == 0)
 				balls[i]->move(balls[i]->velocity.x, balls[i]->velocity.y, dt);
-
+			this->balls[i]->update(dt);
 
 
 			if (balls[i]->GetBody()->GetPosition().x * SCALE + balls[i]->getGlobalBounds().width / 2.f >= this->stateData->gfxSettings->resolution.width)
 			{
 				balls[i]->GetBody()->SetTransform(b2Vec2((this->stateData->gfxSettings->resolution.width - balls[i]->getGlobalBounds().width / 2.f) / SCALE, balls[i]->GetBody()->GetPosition().y), 0);
-
 				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(-balls[i]->GetBody()->GetLinearVelocity().x, balls[i]->GetBody()->GetLinearVelocity().y));
-
+				if (!stateData->mute)
+					this->collisionSound.play();
 			}
 
 			else if (balls[i]->GetBody()->GetPosition().x * SCALE - balls[i]->getGlobalBounds().width / 2.f <= 0)
 			{
 				balls[i]->GetBody()->SetTransform(b2Vec2(balls[i]->getGlobalBounds().width / 2.f / SCALE, balls[i]->GetBody()->GetPosition().y), 0);
 				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(-balls[i]->GetBody()->GetLinearVelocity().x, balls[i]->GetBody()->GetLinearVelocity().y));
-
+				if (!stateData->mute)
+					this->collisionSound.play();
 			}
 
 
 			if (balls[i]->GetBody()->GetPosition().y * SCALE - balls[i]->getGlobalBounds().height / 2.f <= 0)
+			{
+				balls[i]->GetBody()->SetTransform(b2Vec2(balls[i]->GetBody()->GetPosition().x, balls[i]->getGlobalBounds().height / 2.f / SCALE), 0);
 				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(balls[i]->GetBody()->GetLinearVelocity().x, -balls[i]->GetBody()->GetLinearVelocity().y));
+				if (!stateData->mute)
+					this->collisionSound.play();
+			}
 
 			
 
-			this->balls[i]->update(dt);
+			
 
 			UserData* ballData = (UserData*)balls[i]->GetFixtureDef()->userData.pointer;
 			if (ballData->hit)
@@ -491,7 +496,7 @@ void GameState::updateBall(const float& dt)
 
 				balls[i]->GetBody()->SetLinearVelocity(
 					b2Vec2(
-						balls[i]->GetBody()->GetLinearVelocity().x + (angle * std::abs(balls[i]->GetBody()->GetLinearVelocity().x * 5)),
+						balls[i]->GetBody()->GetLinearVelocity().x + (angle * gui::callCharSize(this->vm, 5)),
 						balls[i]->GetBody()->GetLinearVelocity().y - 1));
 				ballData->hit = false;
 			}

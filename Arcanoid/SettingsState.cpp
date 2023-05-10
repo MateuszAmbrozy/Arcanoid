@@ -137,7 +137,7 @@ void SettingsState::initGui(StateData* stateData)
 
 	this->ballList["BALLS"] = new gui::DropDownList(
 		gui::p2pX(25.6f, vm), gui::p2pY(20.6f, vm),
-		gui::p2pX(10.4f, vm), gui::p2pY(4.5f, vm),
+		gui::p2pX(10.4f, vm), gui::p2pY(6.5f, vm),
 		this->stateData->gfxSettings->resolution,
 		font, modes_str.data(), 3, this->ballTextures);
 
@@ -158,17 +158,17 @@ void SettingsState::initGui(StateData* stateData)
 	this->initTexts();
 
 	//SLIDERS
-	this->musicSlider = new gui::Slider(stateData, "GAME MUSIC",
+	this->musicSlider = new gui::Slider(stateData, "GAME MUSIC VOLUME",
 		gui::p2pX(10.f, vm), gui::p2pY(40.f, vm),
 		gui::p2pX(10.f, vm), gui::p2pY(5.f, vm),
 		gui::p2pX(1.f, vm), 0, 100, stateData->musicVolume);
 
-	this->endSoundSlider = new gui::Slider(stateData, "END GAME SOUND",
+	this->endSoundSlider = new gui::Slider(stateData, "END GAME VOLUME",
 		gui::p2pX(30.f, vm), gui::p2pY(40.f, vm),
 		gui::p2pX(10.f, vm), gui::p2pY(5.f, vm),
 		gui::p2pX(1.f, vm), 0, 100, stateData->endVolume);
 
-	this->collisionSoundSlider = new gui::Slider(stateData, "COLLISION",
+	this->collisionSoundSlider = new gui::Slider(stateData, "COLLISION VOLUME",
 		gui::p2pX(50.f, vm), gui::p2pY(40.f, vm),
 		gui::p2pX(10.f, vm), gui::p2pY(5.f, vm),
 		gui::p2pX(1.f, vm), 0, 100, stateData->endVolume);

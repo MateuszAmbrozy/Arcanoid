@@ -123,7 +123,7 @@ void Paddle::biggerPaddle()
 	case 0:
 		this->textureRect.left = 57;
 		this->textureRect.width = 90;
-		this->width = width * 1.428571428571429f;
+		this->width = width * 1.4f;
 		this->shape.setSize(sf::Vector2f(this->width, this->height));
 		this->shape.setTextureRect(this->textureRect);
 		this->setBodySize();
@@ -131,14 +131,14 @@ void Paddle::biggerPaddle()
 	case 57:
 		this->textureRect.left = 147;
 		this->textureRect.width = 128;
-		this->width = width * 1.428571428571429f;
+		this->width = width * 1.4f;
 		this->shape.setSize(sf::Vector2f(this->width, this->height));
 		this->shape.setTextureRect(this->textureRect);
 		this->setBodySize();
 		break;
 	case 147:
 		this->textureRect.left = 275;
-		this->width = width * 1.428571428571429f;
+		this->width = width * 1.4f;//1.428571428571429f
 		this->textureRect.width = 175;
 		this->shape.setSize(sf::Vector2f(this->width, this->height));
 		this->shape.setTextureRect(this->textureRect);

@@ -201,7 +201,6 @@ void BlockSet::collisionBallBlock(StateData* stateData, std::vector<Ball*> balls
 								//remove
 								this->world->DestroyBody(this->blocks[x][y]->GetBody());
 								this->blocks[x][y] = nullptr;
-								//////USUWANIE?/////////////////////////////////
 								}
 
 						}
@@ -228,7 +227,7 @@ void BlockSet::collisionBallBlock(StateData* stateData, std::vector<Ball*> balls
 
 			else
 			{
-				this->timer += (50.f + dt);
+				this->timer += (30.f + dt);
 				if (this->timer >= this->animation_timer)
 				{
 					this->timer = 0.f;
@@ -257,7 +256,7 @@ void BlockSet::removeBlock(const int x, const int y)
 	{
 		if (this->blocks[x][y] != nullptr)
 		{
-			blocks[x][y] = nullptr;
+			this->blocks[x][y] = nullptr;
 			//blocks[x].erase(blocks[x].begin() + y + x * maxSizeWorldGrid.y);
 			//USUWANIE?//////////////////////
 		}
