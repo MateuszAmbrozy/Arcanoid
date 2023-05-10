@@ -1,6 +1,6 @@
 ## Breakout Game with SFML and Box2D
 ## Video
-[![Watch the video](/Arcanoid/Resources/Background/miniature.png)](https://youtu.be/KpI6gExv4bk)<br>
+[![Watch the video](/Arcanoid/Resources/Background/miniature.png)](https://youtu.be/i0wfcGx4zOw)<br>
 This project is a Breakout game built with C++ using SFML and Box2D libraries. <br>
 The game features object-oriented programming concepts such as polymorphism, <br>
 abstract classes, namespaces, and inheritance. Box2D is used for collision detection and physics simulation.<br>
