@@ -13,8 +13,6 @@ The game includes various types of blocks such as regular blocks with different 
 There are also various types of superpowers that players can obtain such as changing paddle size,<br>
 changing ball speed, adding extra balls, and reversing the paddle's movement.<br>
 
-## Dependencies
-To run this project you do not need to have BOX2D nor SFML installed because they are included in Linkers folder.
 ## Building and Running the Game
 Clone this repository.<br>
 Open the project in your C++ IDE.<br>
