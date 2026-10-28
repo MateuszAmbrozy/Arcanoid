@@ -1,62 +1,55 @@
 #pragma once
-#include "State.h"
-#include "Gui.h"
 #include "Ball.h"
-class SettingsState :
-	public State
+#include "Gui.h"
+#include "State.h"
+#include "stdafx.h"
+class SettingsState : public State
 {
-private:
-	//VARIABLES
-	sf::Texture ballTextures[3];//balls icons
-	sf::Texture paddleTexture;
-	sf::IntRect paddleTextureRect[7];
-	sf::Texture bg;
-	sf::IntRect bgTextureRect[5];
+  private:
+    sf::Texture ballTextures[3];
+    sf::Texture paddleTexture;
+    sf::IntRect paddleTextureRect[7];
+    sf::Texture bg;
+    sf::IntRect bgTextureRect[5];
 
-	sf::Font font;
-	sf::Texture backgroundTexture;
-	sf::RectangleShape background;
+    sf::Font font;
+    sf::Texture backgroundTexture;
+    sf::RectangleShape background;
 
-	std::map <std::string, gui::Button*> buttons;
-	std::map <std::string, gui::DropDownList*> resolution;
-	std::map <std::string, gui::DropDownList*> ballList;
-	std::map <std::string, gui::DropDownList*> paddleList;
-	std::map <std::string, gui::DropDownList*> bgList;
+    std::map<std::string, std::unique_ptr<gui::Button>> buttons;
+    std::map<std::string, std::unique_ptr<gui::DropDownList>> resolution;
+    std::map<std::string, std::unique_ptr<gui::DropDownList>> ballList;
+    std::map<std::string, std::unique_ptr<gui::DropDownList>> paddleList;
+    std::map<std::string, std::unique_ptr<gui::DropDownList>> bgList;
 
-	gui::Slider* musicSlider;
-	gui::Slider* endSoundSlider;
-	gui::Slider* collisionSoundSlider;
+    std::unique_ptr<gui::Slider> musicSlider;
+    std::unique_ptr<gui::Slider> endSoundSlider;
+    std::unique_ptr<gui::Slider> collisionSoundSlider;
 
-	sf::Text optionsText;
-	sf::Text resolutionText;
-	sf::Text ballIconText;
-	sf::Text paddleIconText;
-	sf::Text bgIconText;
+    sf::Text optionsText;
+    sf::Text resolutionText;
+    sf::Text ballIconText;
+    sf::Text paddleIconText;
+    sf::Text bgIconText;
 
-	std::vector<sf::VideoMode> modes;
-	
-	//PRIVATE FUNCTIONS
-	void initVariables();
-	void initKeyBinds();
-	void initTextures();
-	void initFonts();
-	void initTexts();
-	void initGui(StateData* stateData);
-public:
+    std::vector<sf::VideoMode> modes;
 
-	//CONSTRUCTOR AND DESTRUCTOR
-	SettingsState(StateData* stateData);
-	virtual ~SettingsState();
+    void initVariables();
+    void initKeyBinds();
+    void initTextures();
+    void initFonts();
+    void initTexts();
+    void initGui(StateData* stateData);
 
-	//FUNCTIONS
-	void resetGui();
-	void updateGui(const float& dt);
-	void updateInput(const float& dt);
-	void update(const float& dt);
-	void renderGui(sf::RenderTarget& target);
-	void renderText(sf::RenderTarget& target);
-	void render(sf::RenderTarget* target = nullptr);
+  public:
+    SettingsState(StateData* stateData);
+    ~SettingsState() override;
 
-
+    void resetGui();
+    void updateGui(float dt);
+    void updateInput(float dt) override;
+    void update(float dt) override;
+    void renderGui(sf::RenderTarget& target);
+    void renderText(sf::RenderTarget& target);
+    void render(sf::RenderTarget* target = nullptr) override;
 };
-

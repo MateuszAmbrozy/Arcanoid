@@ -1,106 +1,100 @@
-#include "stdafx.h"
 #include "Powers.h"
+#include "Assets.h"
+#include "Random.h"
+#include "stdafx.h"
 
-//CONSTRUCTOR AND DESTRUCTOR
-Powers::Powers(StateData* stateData,  sf::Vector2f position)
+Powers::Powers(StateData* stateData, sf::Vector2f position)
 {
-	this->vm = stateData->gfxSettings->resolution;
-	this->maxVelocity = static_cast<float>(gui::callCharSize(stateData->gfxSettings->resolution, 15));
+    this->vm = stateData->gfxSettings->resolution;
+    this->maxVelocity = static_cast<float>(gui::callCharSize(stateData->gfxSettings->resolution, 15));
 
-	this->shape.setPosition(position);
-	this->powerType =  std::rand()%7;
-	if(powerType == this->powerType == 1 || this->powerType == 5 || this->powerType == 6)
-		this->powerType = std::rand() % 7;
+    this->shape.setPosition(position);
+    this->powerType = gameRandom::power();
 
-	if(this->powerType == 2 || this->powerType == 3)
-	{
-		if (!this->texture[1].loadFromFile("Resources/Sprites/ballsPower.png"))
-			std::cout << "ERROR::TEXTURE::LOADFROMFILE::Could not load power.bmp" << std::endl;
-		this->shape.setTexture(&this->texture[1]);
-		shape.setOutlineColor(sf::Color::Green);
-		shape.setOutlineThickness(-1.f);
-	}
-	else if (this->powerType == 1 || this->powerType == 5 || this->powerType == 6)
-	{
-		if (!this->texture[2].loadFromFile("Resources/Sprites/warningPower.png"))
-			std::cout << "ERROR::TEXTURE::LOADFROMFILE::Could not load power.bmp" << std::endl;
-		this->shape.setTexture(&this->texture[2]);
-	}
-	else 
-	{
-		if (!this->texture[0].loadFromFile("Resources/Sprites/power.png"))
-			std::cout << "ERROR::TEXTURE::LOADFROMFILE::Could not load power.bmp" << std::endl;
-		this->shape.setTexture(&this->texture[0]);
-	}
-	this->shape.setRadius(gui::p2pX(1.8f, this->vm));
+    if (this->powerType == 2 || this->powerType == 3)
+    {
+        assets::load(this->texture[1], "Resources/Sprites/ballsPower.png");
+        this->shape.setTexture(&this->texture[1]);
+        shape.setOutlineColor(sf::Color::Green);
+        shape.setOutlineThickness(-1.f);
+    }
+    else if (this->powerType == 1 || this->powerType == 5 || this->powerType == 6)
+    {
+        assets::load(this->texture[2], "Resources/Sprites/warningPower.png");
+        this->shape.setTexture(&this->texture[2]);
+    }
+    else
+    {
+        assets::load(this->texture[0], "Resources/Sprites/power.png");
+        this->shape.setTexture(&this->texture[0]);
+    }
+    this->shape.setRadius(gui::p2pX(1.8f, this->vm));
 }
-Powers::~Powers()
-{
-}
+Powers::~Powers() = default;
 
-//ACCESSORS
-const bool Powers::intersects(const sf::FloatRect bounds) const
+bool Powers::intersects(const sf::FloatRect bounds) const
 {
-	return this->shape.getGlobalBounds().intersects(bounds);
+    return this->shape.getGlobalBounds().intersects(bounds);
 }
-const unsigned short Powers::getType() const
+unsigned short Powers::getType() const
 {
-	return this->powerType;
+    return this->powerType;
 }
-const sf::FloatRect Powers::getGlobalBounds() const
+sf::FloatRect Powers::getGlobalBounds() const
 {
-	return this->shape.getGlobalBounds();
+    return this->shape.getGlobalBounds();
 }
 
-//FUNCTIONS
-void Powers::move(const float& dt)
+void Powers::move(float dt)
 {
-	this->shape.move(0.f, this->maxVelocity * dt);
+    this->shape.move(0.f, this->maxVelocity * dt);
 }
-void Powers::initNewBalls(StateData* stateData, b2World* world, std::vector<Ball*>* balls)
+void Powers::initNewBalls(StateData* stateData, b2World* world, std::vector<std::unique_ptr<Ball>>* balls)
 {
-	size_t size = balls->size();
-		for(size_t i=0; i<size; i++)
-		{
-			balls->push_back(new Ball(stateData, world, gui::p2pX(1.4f, this->vm), balls->at(i)->getPosition()));
-		}
+    const size_t size = balls->size();
+    for (size_t i = 0; i < size && balls->size() < gameConfig::maxBalls; i++)
+    {
+        balls->push_back(
+            std::make_unique<Ball>(stateData, world, gui::p2pX(1.4f, this->vm), balls->at(i)->getPosition()));
+    }
 }
-void Powers::initNewBallsFromPaddle(StateData* stateData, b2World* world, Paddle* paddle, std::vector<Ball*>* balls)
+void Powers::initNewBallsFromPaddle(StateData* stateData, b2World* world, Paddle* paddle,
+                                    std::vector<std::unique_ptr<Ball>>* balls)
 {
-	balls->push_back(new Ball(stateData, world, paddle, gui::p2pX(1.4f, this->vm)));
-	balls->push_back(new Ball(stateData, world, paddle, gui::p2pX(1.4f, this->vm)));
-	balls->push_back(new Ball(stateData, world, paddle, gui::p2pX(1.4f, this->vm)));
+    for (int i = 0; i < 3 && balls->size() < gameConfig::maxBalls; ++i)
+        balls->push_back(std::make_unique<Ball>(stateData, world, paddle, gui::p2pX(1.4f, vm)));
 }
 void Powers::initBiggerPaddle(Paddle* paddle)
 {
-	paddle->biggerPaddle();
+    paddle->biggerPaddle();
 }
 void Powers::initSmallerPaddle(Paddle* paddle)
 {
-	paddle->smallerPaddle();
+    paddle->smallerPaddle();
 }
-void Powers::initFastBalls(std::vector<Ball*>* balls)
+void Powers::initFastBalls(std::vector<std::unique_ptr<Ball>>* balls)
 {
-	for (auto& ball : *balls)
-	{
-		ball->GetBody()->SetLinearVelocity(b2Vec2(ball->GetBody()->GetLinearVelocity().x * 1.3f, ball->GetBody()->GetLinearVelocity().y * 1.3f));
-	}
+    for (auto& ball : *balls)
+    {
+        ball->getBody()->SetLinearVelocity(b2Vec2(ball->getBody()->GetLinearVelocity().x * 1.3f,
+                                                  ball->getBody()->GetLinearVelocity().y * 1.3f));
+    }
 }
-void Powers::initSlowBalls(std::vector<Ball*>* balls)
+void Powers::initSlowBalls(std::vector<std::unique_ptr<Ball>>* balls)
 {
-	for (auto& ball : *balls)
-	{
-		ball->GetBody()->SetLinearVelocity(b2Vec2(ball->GetBody()->GetLinearVelocity().x * 0.9f, ball->GetBody()->GetLinearVelocity().y * 0.9f));;
-	}
+    for (auto& ball : *balls)
+    {
+        ball->getBody()->SetLinearVelocity(b2Vec2(ball->getBody()->GetLinearVelocity().x * 0.9f,
+                                                  ball->getBody()->GetLinearVelocity().y * 0.9f));
+        ;
+    }
 }
 
-void Powers::update(const float& dt)
+void Powers::update(float dt)
 {
-	this->move(dt);
+    this->move(dt);
 }
 void Powers::render(sf::RenderTarget& target)
 {
-	target.draw(this->shape);
+    target.draw(this->shape);
 }
-
-

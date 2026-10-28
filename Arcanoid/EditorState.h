@@ -1,20 +1,19 @@
 #pragma once
-#include "State.h"
-#include "Gui.h"
 #include "BlockSet.h"
+#include "Gui.h"
 #include "PausedMenu.h"
-class EditorState :
-    public State
+#include "State.h"
+#include "stdafx.h"
+class EditorState : public State
 {
-private:
-    //VARIABLES
+  private:
     sf::Font font;
     sf::Text cursorText;
 
-    std::map <std::string, gui::Button*> buttons;
-    BlockSet* blockSet;
-    PausedMenu* pausedMenu;
-    gui::TextureSelector* textureSelector;
+    std::map<std::string, std::unique_ptr<gui::Button>> buttons;
+    std::unique_ptr<BlockSet> blockSet;
+    std::unique_ptr<PausedMenu> pausedMenu;
+    std::unique_ptr<gui::TextureSelector> textureSelector;
 
     sf::RectangleShape selectorRect;
     sf::IntRect textureRect;
@@ -22,14 +21,12 @@ private:
 
     std::string filename;
     short type;
-    int lifes;
+    int lives;
 
-    //Background
     sf::Texture bgTexture;
     sf::RectangleShape background;
     sf::IntRect bgTextureRect;
 
-    //PRIVATE FUNCTIONS
     void initVariables();
     void initKeyBinds();
     void initFonts();
@@ -38,20 +35,18 @@ private:
     void initBlockSet();
     void initGUI();
     void initBackground();
-public:
-    //CONSTRUCTOR AND DESTRUCTOR
-    EditorState(StateData* stateData, std::string filename);
-    virtual ~EditorState();
 
-    //FUNCSTIONS
+  public:
+    EditorState(StateData* stateData, std::string filename);
+    ~EditorState() override;
+
     void updateButtons();
-    void updateEditorInput(const float& dt);
+    void updateEditorInput(float dt);
     void updatePausedMenuButtons();
-    void updateInput(const float& dt);
+    void updateInput(float dt) override;
     void updateGUI();
-    void update(const float& dt);
+    void update(float dt) override;
     void renderButtons(sf::RenderTarget& target);
     void renderGUI(sf::RenderTarget& target);
-    void render(sf::RenderTarget* target = NULL);
+    void render(sf::RenderTarget* target = nullptr) override;
 };
-

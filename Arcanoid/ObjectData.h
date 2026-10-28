@@ -1,11 +1,15 @@
 #pragma once
+#include "stdafx.h"
+
+enum class ObjectType
+{
+    Ball,
+    Block,
+    Paddle
+};
 
 struct UserData
 {
-    std::string name;
+    ObjectType type = ObjectType::Ball;
     bool hit = false;
 };
-
-#define SCALE 30.f
-
-

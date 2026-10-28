@@ -1,43 +1,47 @@
 #pragma once
 #include "Ball.h"
-#include "Paddle.h"
 #include "Gui.h"
+#include "Paddle.h"
+#include "stdafx.h"
 
-enum PowerTypes { BIGGERPADDLE = 0, SMALLPADDLE, NEWBALLS, NEWBALLFROMPADDLE, FASTBALL, SLOWBALL, VICEVERSA};
+enum PowerTypes
+{
+    BIGGERPADDLE = 0,
+    SMALLPADDLE,
+    NEWBALLS,
+    NEWBALLFROMPADDLE,
+    FASTBALL,
+    SLOWBALL,
+    VICEVERSA
+};
 class Powers
 {
-private:
-	sf::Texture texture[3];
+  private:
+    sf::Texture texture[3];
 
-	sf::CircleShape shape;
-	float maxVelocity;
-	short unsigned powerType;
-	sf::VideoMode vm;
-public:
+    sf::CircleShape shape;
+    float maxVelocity;
+    short unsigned powerType;
+    sf::VideoMode vm;
 
-	//CONSTRUCTOR AND DESTRUCTOR
-	Powers(StateData* stateData, sf::Vector2f position);
-	virtual ~Powers();
+  public:
+    Powers(StateData* stateData, sf::Vector2f position);
+    ~Powers();
 
-	//ACCESSORS
-	const bool intersects(const sf::FloatRect bounds) const;
-	const unsigned short getType() const;
-	const sf::FloatRect getGlobalBounds() const;
+    bool intersects(const sf::FloatRect bounds) const;
+    unsigned short getType() const;
+    sf::FloatRect getGlobalBounds() const;
 
-	//FUNCTIONS
+    void move(float dt);
 
-	void move(const float& dt);
+    void initNewBalls(StateData* stateData, b2World* world, std::vector<std::unique_ptr<Ball>>* balls);
+    void initNewBallsFromPaddle(StateData* stateData, b2World* world, Paddle* paddle,
+                                std::vector<std::unique_ptr<Ball>>* balls);
+    void initBiggerPaddle(Paddle* paddle);
+    void initSmallerPaddle(Paddle* paddle);
+    void initFastBalls(std::vector<std::unique_ptr<Ball>>* balls);
+    void initSlowBalls(std::vector<std::unique_ptr<Ball>>* balls);
 
-	void initNewBalls(StateData* stateData, b2World* world, std::vector<Ball*>* balls);
-	void initNewBallsFromPaddle(StateData* stateData, b2World* world, Paddle* paddle, std::vector<Ball*>* balls);
-	void initBiggerPaddle(Paddle* paddle);
-	void initSmallerPaddle(Paddle* paddle);
-	void initFastBalls(std::vector<Ball*>* balls);
-	void initSlowBalls(std::vector<Ball*>* balls);
-
-
-	void update(const float& dt);
-	void render(sf::RenderTarget& target);
-
+    void update(float dt);
+    void render(sf::RenderTarget& target);
 };
-

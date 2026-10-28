@@ -1,42 +1,32 @@
 #pragma once
+#include "stdafx.h"
 class Timer
 {
-private:
-	//VARIABLES
-	clock_t start_;
-	clock_t end_;
+  private:
+    float elapsed = 0.f;
+    bool running = false;
 
-	sf::Text menuText;
-	sf::Font font;
+    sf::Text menuText;
+    sf::Font font;
 
-	sf::Text text;
+    sf::Text text;
 
-	void initFont();
+    void initFont();
 
-public:
+  public:
+    Timer();
+    ~Timer();
 
+    void setPosition(sf::Vector2f position);
+    void setString(std::string str);
+    void setCharacterSize(unsigned int charSize);
+    int getElapsedTime() const;
 
+    void start();
+    void reset();
+    void stop();
+    void resume();
 
-	//CONSTRUCTOR AND DESTRUCTOR
-	Timer();
-	virtual ~Timer();
-
-	//MODIFIERS
-	void setPosition(sf::Vector2f position);
-	void setString(std::string str);
-	void setCharacterSize(unsigned int charSize);
-	//ACCESSORS
-	int getElapsedTime();
-
-	//FUNCTIONS
-	void start();
-	void reset();
-	void stop();
-	void resume();
-	
-
-
-	void update(const float& dt);
-	void render(sf::RenderTarget& target);
+    void update(float dt);
+    void render(sf::RenderTarget& target);
 };
-

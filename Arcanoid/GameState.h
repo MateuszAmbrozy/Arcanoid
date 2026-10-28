@@ -1,48 +1,44 @@
 #pragma once
-#include "State.h"
-#include "PausedMenu.h"
+#include "Ball.h"
+#include "BlockSet.h"
+#include "ContactListener.h"
+#include "EndGame.h"
 #include "GraphicsSettings.h"
 #include "Paddle.h"
-#include "Ball.h"
+#include "PausedMenu.h"
+#include "State.h"
 #include "Timer.h"
-#include "BlockSet.h"
-#include "EndGame.h"
-#include "ContactListener.h"
+#include "stdafx.h"
 
-class GameState :
-    public State
+class GameState : public State
 {
-private:
-    //VARIABLES
+  private:
+    std::unique_ptr<ContactListener> contactListener;
+    std::unique_ptr<b2World> world;
+    float physicsAccumulator = 0.f;
     sf::Font font;
 
-    PausedMenu* pausedMenu;
-    EndGame* lose;
-    EndGame* win;
-    Paddle* paddle;
-    bool paddleIsMoving;
+    std::unique_ptr<PausedMenu> pausedMenu;
+    std::unique_ptr<EndGame> lose;
+    std::unique_ptr<EndGame> win;
+    std::unique_ptr<Paddle> paddle;
 
-    std::vector<Ball*> balls;
-    Timer* timer;
-    BlockSet* blockSet;
+    std::vector<std::unique_ptr<Ball>> balls;
+    std::unique_ptr<Timer> timer;
+    std::unique_ptr<BlockSet> blockSet;
     sf::VideoMode vm;
-    
-    bool startGame;
-    bool renderEnd;
-    sf::Vector2f ballVelocity;
 
-    //LIFES
-    unsigned lifeCounter;
+    bool startGame;
+
+    unsigned livesRemaining;
     sf::Texture lifeTexture;
     sf::Sprite lifeSprite;
-    std::vector<sf::Sprite> lifes;
+    std::vector<sf::Sprite> lives;
 
-    //BACKGROUND
     sf::Texture bgTexture;
     sf::RectangleShape background;
     sf::IntRect textureRect;
 
-    //SOUND
     sf::SoundBuffer buffer[3];
     sf::Sound collisionSound;
     sf::Music music;
@@ -50,20 +46,11 @@ private:
     sf::Sound winSound;
     bool playMusic;
 
-    //INVERSE PADDLE TIMER
-    sf::Clock clock;
-    gui::Bar* inversePaddleBar;
+    std::unique_ptr<gui::Bar> inversePaddleBar;
 
-    //Box2d
-    b2World* world;
-    ContactListener* contactListener;
-    std::vector<b2Vec2> velocityBuffer;
-
-
-    //PRIVATE FUNCTIONS
     void initVariables();
     void initB2World();
-    void initB2WorldBounds();
+
     void initContactListener();
     void initPaddle();
     void initBalls();
@@ -71,37 +58,33 @@ private:
     void initPausedMenu();
     void initBar();
     void initTimer();
-    void initLifes();
+    void initLives();
     void initBlockSet(std::string filename);
     void initEndGame();
     void initSound();
 
-
     void initKeyBinds();
     void initFont();
-public:
-    //CONSTRUCTOR AND DESTRUCTOR
+
+  public:
     GameState(StateData* stateData, std::string filename);
-    virtual ~GameState();
+    ~GameState() override;
 
-    //ACCESSRS
-    std::vector<Ball*> getBalls();
+    const std::vector<std::unique_ptr<Ball>>& getBalls() const;
 
-    //FUNCSTIONS
-    void updateInput(const float& dt);
+    void updateInput(float dt) override;
     void updatePausedButtons();
     void updateEndGameButtons();
-    void updateEndGame(const float& dt);
-    void updateTimer(const float& dt);
-    void updateBall(const float& dt);
-    void updateBlockSet(const float& dt);
-    void updateInverseTimer();
-    void update(const float& dt);
+    void updateEndGame(float dt);
+    void updateTimer(float dt);
+    void updateBall(float dt);
+    void updateBlockSet(float dt);
+    void updateInverseTimer(float dt);
+    void update(float dt) override;
 
     void renderEndGame(sf::RenderTarget* target);
     void renderBalls(sf::RenderTarget* target);
-    void renderLifes(sf::RenderTarget* target);
+    void renderLives(sf::RenderTarget* target);
 
-    void render(sf::RenderTarget* target);
+    void render(sf::RenderTarget* target) override;
 };
-

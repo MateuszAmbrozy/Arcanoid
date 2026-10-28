@@ -1,68 +1,62 @@
-#include "stdafx.h"
 #include "State.h"
+#include "stdafx.h"
 
-//CONSTRUCTOR AND DESTRUCTOR
 State::State(StateData* stateData)
 {
-	this->gridWidth = stateData->gridWidth;
-	this->gridHeight = stateData->gridHeight;
+    this->gridWidth = stateData->gridWidth;
+    this->gridHeight = stateData->gridHeight;
 
-	this->stateData = stateData;
-	this->window = stateData->window;
-	this->supportedKeys = stateData->supportedKeys;
-	this->states = stateData->states;
-	this->paused = false;
-	this->quit = false;
-
-	this->keyTimaMax = 0.5f;
-	this->keyTimer.restart();
-
+    this->stateData = stateData;
+    this->window = stateData->window;
+    this->supportedKeys = stateData->supportedKeys;
+    this->states = stateData->states;
+    this->paused = false;
+    this->quit = false;
 }
-State::~State()
-{
-}
+State::~State() = default;
 
-//MODIFIERS
 void State::pauseState()
 {
-	this->paused = true;
+    this->paused = true;
 }
 void State::unpauseState()
 {
-	this->paused = false;
+    this->paused = false;
 }
 void State::endState()
 {
-	this->quit = true;
+    this->quit = true;
 }
 
-//FUNCTIONS
 void State::checkForQuit()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keyBinds.at("CLOSE"))))
-		this->quit = true;
+    if (stateData->isKeyPressed(sf::Keyboard::Key(this->keyBinds.at("CLOSE"))))
+        this->quit = true;
 }
 void State::updateMousePosition()
 {
-	this->mousePosWindow = sf::Mouse::getPosition(*this->window);
-	this->mousePosGrid =
-		sf::Vector2i(
-			static_cast<int>(this->mousePosWindow.x) / static_cast<int>(this->gridWidth),
-			static_cast<int>(this->mousePosWindow.y) / static_cast<int>(this->gridHeight)
-		);
+    this->mousePosWindow = stateData->mousePosition;
+    this->mousePosGrid =
+        sf::Vector2i(static_cast<int>(std::floor(this->mousePosWindow.x / this->stateData->gridWidth)),
+                     static_cast<int>(std::floor(this->mousePosWindow.y / this->stateData->gridHeight)));
 }
-const bool& State::getQuit() const
+bool State::getQuit() const
 {
-	return this->quit;
+    return this->quit;
 }
-const bool State::getKeyTime()
+void State::loadKeyBinds(const std::string& path)
 {
-	if (this->keyTimer.getElapsedTime().asSeconds() >= this->keyTimaMax)
-	{
-		this->keyTimer.restart();
-		return true;
-	}
-	else
-		return false;
+    std::ifstream input(path);
+    if (!input)
+        throw std::runtime_error("Cannot open key bindings: " + path);
+    std::string action, key;
+    while (input >> action >> key)
+    {
+        const auto supported = supportedKeys->find(key);
+        if (supported == supportedKeys->end())
+            throw std::runtime_error("Unknown key: " + key);
+        keyBinds[action] = supported->second;
+    }
+    if (!input.eof())
+        throw std::runtime_error("Invalid key bindings: " + path);
 }
-

@@ -1,13 +1,12 @@
 #pragma once
-#include "State.h"
-#include "Gui.h"
-#include "GameState.h"
 #include "EditorState.h"
-class LevelState :
-    public State
+#include "GameState.h"
+#include "Gui.h"
+#include "State.h"
+#include "stdafx.h"
+class LevelState : public State
 {
-private:
-    //VARIABLES
+  private:
     sf::Vector2f buttonSize;
     std::string filename;
 
@@ -16,17 +15,14 @@ private:
     sf::Font font;
 
     sf::Text text;
-    std::map <std::string, gui::Button*> buttons;
+    std::map<std::string, std::unique_ptr<gui::Button>> buttons;
     sf::VideoMode vm;
-
 
     sf::RectangleShape chosenLevel;
 
-    //background
     sf::Texture bgTexture;
     sf::RectangleShape background;
 
-    //PRIVATE FUNCTIONS
     void initVariables();
     void initChosenLevelRectangle();
     void initKeyBinds();
@@ -34,19 +30,14 @@ private:
     void initFont();
     void initText(StateData* stateData);
     void initBackground();
-    
-    
-public:
-    //CONSTRUCTOR AND DESTRUCTOR
-    LevelState(StateData* stateData, int whichState); // 0-gamestate, 1-editorstate
-    virtual ~LevelState();
 
+  public:
+    LevelState(StateData* stateData, int whichState);
+    ~LevelState() override;
 
-    //FUNCSTIONS
-    void updateInput(const float& dt);
+    void updateInput(float dt) override;
     void updateButtons();
-    void update(const float& dt);
+    void update(float dt) override;
     void renderButtons(sf::RenderTarget& target);
-    void render(sf::RenderTarget* target = nullptr);
+    void render(sf::RenderTarget* target = nullptr) override;
 };
-

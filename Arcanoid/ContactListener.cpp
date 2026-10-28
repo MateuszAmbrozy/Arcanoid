@@ -1,54 +1,34 @@
-#include "stdafx.h"
 #include "ContactListener.h"
+#include "stdafx.h"
 
-ContactListener::ContactListener(b2World* world)
+namespace
 {
-    this->world = world;
+UserData* data(b2Fixture* fixture)
+{
+    return reinterpret_cast<UserData*>(fixture->GetUserData().pointer);
 }
-
-ContactListener::~ContactListener() {}
+} // namespace
 
 void ContactListener::BeginContact(b2Contact* contact)
 {
-    b2Fixture* fixtureA = contact->GetFixtureA();
-    b2Fixture* fixtureB = contact->GetFixtureB();
-
-    auto bodyA = contact->GetFixtureA()->GetBody();
-    auto bodyB = contact->GetFixtureB()->GetBody();
-
-    UserData* userDataA = (UserData*)fixtureA->GetUserData().pointer;
-    UserData* userDataB = (UserData*)fixtureB->GetUserData().pointer;
-    if (userDataA && userDataB)
-    {
-
-       if (userDataA->name == "ball" && userDataB->name == "block")
-       {
-           userDataB->hit = true; 
-       }
-       if (userDataA->name == "block" && userDataB->name == "ball")
-       {
-           userDataA->hit = true;
-       }
-       if (userDataA->name == "paddle" && userDataB->name == "ball")
-       {
-           userDataB->hit = true;
-       }
-       if (userDataB->name == "paddle" && userDataA->name == "ball")
-       {
-           userDataA->hit = true;
-       }
-
-    }
-
+    auto* a = data(contact->GetFixtureA());
+    auto* b = data(contact->GetFixtureB());
+    if (!a || !b)
+        return;
+    if (a->type == ObjectType::Ball && b->type == ObjectType::Block)
+        b->hit = true;
+    if (b->type == ObjectType::Ball && a->type == ObjectType::Block)
+        a->hit = true;
+    if (a->type == ObjectType::Ball && b->type == ObjectType::Paddle)
+        a->hit = true;
+    if (b->type == ObjectType::Ball && a->type == ObjectType::Paddle)
+        b->hit = true;
 }
-void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
-{
-    UserData* userDataA = (UserData*)contact->GetFixtureA()->GetUserData().pointer;
-    UserData* userDataB = (UserData*)contact->GetFixtureB()->GetUserData().pointer;
 
-    if (userDataA && userDataB)
-    {
-        if(userDataA->name == "ball" && userDataB->name == "ball")
-             contact->SetEnabled(false);
-    }
+void ContactListener::PreSolve(b2Contact* contact, const b2Manifold*)
+{
+    const auto* a = data(contact->GetFixtureA());
+    const auto* b = data(contact->GetFixtureB());
+    if (a && b && a->type == ObjectType::Ball && b->type == ObjectType::Ball)
+        contact->SetEnabled(false);
 }

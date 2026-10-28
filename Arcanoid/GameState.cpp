@@ -1,621 +1,450 @@
-#include "stdafx.h"
 #include "GameState.h"
+#include "Assets.h"
+#include "LevelCatalog.h"
+#include "stdafx.h"
 
-//PRIVATE FUNCTIONS
 void GameState::initVariables()
 {
-	this->startGame = false;
-	this->vm = this->stateData->gfxSettings->resolution;
-	this->renderEnd = false;
-	this->paddleIsMoving = false;
+    this->startGame = false;
+    this->vm = this->stateData->gfxSettings->resolution;
 }
 void GameState::initB2World()
 {
-	this->world = new b2World(b2Vec2(0.f, 0.f));
-}
-void GameState::initB2WorldBounds()
-{
-	float  widthInMeters = stateData->gfxSettings->resolution.width / SCALE;
-	float  heightInMeters = stateData->gfxSettings->resolution.height / SCALE;
-	b2Vec2 lowerLeftCorner = b2Vec2(0, 0);
-	b2Vec2 lowerRightCorner = b2Vec2(widthInMeters, 0);
-	b2Vec2 upperLeftCorner = b2Vec2(0, heightInMeters);
-	b2Vec2 upperRightCorner = b2Vec2(widthInMeters, heightInMeters);
-
-	// static container body, with the collisions at screen borders
-	b2BodyDef screenBorderDef;
-	screenBorderDef.position.Set(0, 0);
-	screenBorderDef.type = b2_staticBody;
-	b2Body* screenBorderBody = world->CreateBody(&screenBorderDef);
-	b2EdgeShape screenBorderShape;
-
-	// Create fixtures for the three borders (the border shape is re-used)
-	screenBorderShape.SetTwoSided(lowerLeftCorner, lowerRightCorner);
-	screenBorderBody->CreateFixture(&screenBorderShape, 0);
-	screenBorderShape.SetTwoSided(lowerRightCorner, upperRightCorner);
-	screenBorderBody->CreateFixture(&screenBorderShape, 0);
-	screenBorderShape.SetTwoSided(upperLeftCorner, lowerLeftCorner);
-	screenBorderBody->CreateFixture(&screenBorderShape, 0);
+    this->world = std::make_unique<b2World>(b2Vec2(0.f, 0.f));
 }
 void GameState::initContactListener()
 {
-	this->contactListener = new ContactListener(world);
-	world->SetContactListener(this->contactListener);
+    this->contactListener = std::make_unique<ContactListener>();
+    world->SetContactListener(this->contactListener.get());
 }
 void GameState::initPaddle()
 {
-	this->paddle = new Paddle(this->stateData, this->world);
+    this->paddle = std::make_unique<Paddle>(this->stateData, this->world.get());
 }
 void GameState::initBalls()
 {
-	this->balls.push_back(new Ball(this->stateData, this->world, this->paddle, gui::p2pX(1.4f, this->vm)));
+    this->balls.push_back(std::make_unique<Ball>(this->stateData, this->world.get(), this->paddle.get(),
+                                                 gui::p2pX(1.4f, this->vm)));
 }
 void GameState::initBackground()
 {
-	this->textureRect = sf::IntRect(0, 0, 200, 241);
+    this->textureRect = sf::IntRect(0, 0, 200, 241);
 
-	if (!this->bgTexture.loadFromFile("Resources/Background/bg3.png"))
-		std::cout << "ERROR::GAMESTATE::INITBACKGROUND::Could not load bg3.png \n";
+    assets::load(this->bgTexture, "Resources/Background/bg3.png");
 
-	this->background.setSize(sf::Vector2f(static_cast<float>(vm.width), static_cast<float>(vm.height)));
-	if(this->stateData->bgLeftRect != -1)
-	{
-		this->textureRect.left = stateData->bgLeftRect;
-	}
-	std::cout << "BGLEFT: " << this->stateData->bgLeftRect << std::endl;
-	this->background.setTextureRect(this->textureRect);
-	this->background.setTexture(&this->bgTexture);
+    this->background.setSize(sf::Vector2f(static_cast<float>(vm.width), static_cast<float>(vm.height)));
+    if (this->stateData->bgLeftRect != -1)
+    {
+        this->textureRect.left = stateData->bgLeftRect;
+    }
+
+    this->background.setTextureRect(this->textureRect);
+    this->background.setTexture(&this->bgTexture);
 }
 void GameState::initPausedMenu()
 {
-	//PAUSED MENU
-	this->pausedMenu = new PausedMenu(this->stateData->gfxSettings->resolution);
-	this->pausedMenu->addButton("BACK", gui::p2pX(26.f, this->vm),
-		gui::p2pY(23.8f, this->vm), gui::p2pX(6.6f, this->vm),
-		gui::callCharSize(this->vm, 100),
-		sf::Color::Black, sf::Color(250, 250, 250, 250), sf::Color(20, 20, 20, 50),
-		sf::Color(200, 100, 100), sf::Color(200, 100, 100, 100), sf::Color(20, 20, 20, 50),
-		"BACK");
-
+    this->pausedMenu = std::make_unique<PausedMenu>(this->stateData->gfxSettings->resolution);
+    this->pausedMenu->addButton("BACK", gui::p2pX(26.f, this->vm), gui::p2pY(23.8f, this->vm),
+                                gui::p2pX(6.6f, this->vm), gui::callCharSize(this->vm, 100), sf::Color::Black,
+                                sf::Color(250, 250, 250, 250), sf::Color(20, 20, 20, 50),
+                                sf::Color(200, 100, 100), sf::Color(200, 100, 100, 100),
+                                sf::Color(20, 20, 20, 50), "BACK");
 }
 void GameState::initBar()
 {
-	this->inversePaddleBar = new gui::Bar(gui::p2pX(50.f, this->vm), gui::p2pY(5.f, this->vm), gui::p2pX(12.f, this->vm), gui::p2pY(4.f, this->vm), 10, this->vm, this->font, sf::Color::Red);
+    this->inversePaddleBar = std::make_unique<gui::Bar>(gui::p2pX(50.f, this->vm), gui::p2pY(5.f, this->vm),
+                                                        gui::p2pX(12.f, this->vm), gui::p2pY(4.f, this->vm),
+                                                        10, this->vm, this->font, sf::Color::Red);
 }
 void GameState::initTimer()
 {
-	this->timer = new Timer();
-	this->timer->setPosition(sf::Vector2f(gui::p2pX(5.2f, this->vm), gui::p2pY(9.25f, this->vm)));
-	this->timer->setCharacterSize(gui::callCharSize(this->vm, 80));
+    this->timer = std::make_unique<Timer>();
+    this->timer->setPosition(sf::Vector2f(gui::p2pX(5.2f, this->vm), gui::p2pY(9.25f, this->vm)));
+    this->timer->setCharacterSize(gui::callCharSize(this->vm, 80));
 }
-void GameState::initLifes()
+void GameState::initLives()
 {
-	this->lifeCounter = 3;
-	if (!this->lifeTexture.loadFromFile("Resources/Sprites/heart.png"))
-		std::cout << "ERROR::GAMESTATE::INITLIFES::Could not load heart texture" << std::endl;
-	this->lifeSprite.setTexture(this->lifeTexture);
-	this->lifeSprite.setScale(0.03f, 0.0346f);
-	
-	for (size_t i = 0; i < lifeCounter; i++)
-	{
-		this->lifes.push_back(this->lifeSprite);
-		this->lifes[i].setPosition(i * this->lifeSprite.getGlobalBounds().width + gui::p2pX(1.0f, this->vm), 0);
-	}
+    this->livesRemaining = gameConfig::initialLives;
+    assets::load(this->lifeTexture, "Resources/Sprites/heart.png");
+    this->lifeSprite.setTexture(this->lifeTexture);
+    this->lifeSprite.setScale(0.03f, 0.0346f);
+
+    for (size_t i = 0; i < livesRemaining; i++)
+    {
+        this->lives.push_back(this->lifeSprite);
+        this->lives[i].setPosition(i * this->lifeSprite.getGlobalBounds().width + gui::p2pX(1.0f, this->vm),
+                                   0);
+    }
 }
 void GameState::initKeyBinds()
 {
-	std::fstream ifs("Config/gamestate_keybinds.ini");
-	if (ifs.is_open())
-	{
-		std::string key = "";
-		std::string key2 = "";
-
-		while (ifs >> key >> key2)
-		{
-			this->keyBinds[key] = this->supportedKeys->at(key2);
-		}
-	}
-	ifs.close();
+    loadKeyBinds("Config/gamestate_keybinds.ini");
 }
 void GameState::initFont()
 {
-	if (!this->font.loadFromFile("Fonts/Arialn.ttf"))
-		std::cout << ("ERROR::GAMESTATE::INITFONTS::Could not load font!");
+    assets::load(this->font, "Fonts/Arialn.ttf");
 }
 void GameState::initBlockSet(std::string filename)
 {
-	this->blockSet = new BlockSet(this->stateData, this->world,  filename, this->stateData->gridWidth, this->stateData->gridHeight);
+    this->blockSet = std::make_unique<BlockSet>(this->stateData, this->world.get(), filename,
+                                                this->stateData->gridWidth, this->stateData->gridHeight);
 }
 void GameState::initEndGame()
 {
-	this->lose = new EndGame(this->stateData->gfxSettings->resolution, "BACK", "YOU LOSE!");
-	this->win = new EndGame(this->stateData->gfxSettings->resolution, "BACK", "NEXT", "YOU WIN!");
-	
+    lose = std::make_unique<EndGame>(stateData->gfxSettings->resolution, "BACK", "YOU LOSE!");
+    if (levels::next(levels::number(blockSet->getFileName())) != 0)
+        win = std::make_unique<EndGame>(stateData->gfxSettings->resolution, "BACK", "NEXT", "YOU WIN!");
+    else
+        win = std::make_unique<EndGame>(stateData->gfxSettings->resolution, "BACK", "ALL LEVELS COMPLETE!",
+                                        EndGameResult::Victory);
 }
 void GameState::initSound()
 {
 
-	this->playMusic = true;
+    this->playMusic = true;
 
-	//collision sound
-	if (!this->buffer[0].loadFromFile("Resources/Sounds/w.wav"))
-		std::cout << "ERROR::BLOCKSET::INITSOUND::Could not load collision sound \n";
-	this->collisionSound.setBuffer(this->buffer[0]);
-	this->collisionSound.setVolume(this->stateData->collisionVolume);
+    assets::load(this->buffer[0], "Resources/Sounds/w.wav");
+    this->collisionSound.setBuffer(this->buffer[0]);
+    this->collisionSound.setVolume(this->stateData->collisionVolume);
 
-		
-	//game music
-	if(!this->music.openFromFile("Resources/Sounds/music.wav"))
-		std::cout << "ERROR::BLOCKSET::INITSOUND::Could not load music \n";
-	this->music.setLoop(true);
-	this->music.setVolume(this->stateData->musicVolume);
-	if(!this->stateData->mute)
-		this->music.play();
+    if (!this->music.openFromFile("Resources/Sounds/music.wav"))
+        throw std::runtime_error("Cannot load Resources/Sounds/music.wav");
+    this->music.setLoop(true);
+    this->music.setVolume(this->stateData->musicVolume);
+    if (!this->stateData->mute)
+        this->music.play();
 
+    assets::load(this->buffer[1], "Resources/Sounds/lose.wav");
+    this->loseSound.setBuffer(this->buffer[1]);
+    this->loseSound.setVolume(this->stateData->endVolume);
 
-	//lose soud
-	if (!this->buffer[1].loadFromFile("Resources/Sounds/lose.wav"))
-		std::cout << "ERROR::BLOCKSET::INITSOUND::Could not load lose sound \n";
-	this->loseSound.setBuffer(this->buffer[1]);
-	this->loseSound.setVolume(this->stateData->endVolume);
-
-	//win sound
-	if (!this->buffer[2].loadFromFile("Resources/Sounds/win.wav"))
-		std::cout << "ERROR::BLOCKSET::INITSOUND::Could not load win sound \n";
-	this->winSound.setBuffer(this->buffer[2]);
-	this->winSound.setVolume(this->stateData->endVolume);
+    assets::load(this->buffer[2], "Resources/Sounds/win.wav");
+    this->winSound.setBuffer(this->buffer[2]);
+    this->winSound.setVolume(this->stateData->endVolume);
 }
 
-//CONSTRUCTOR AND DESTRUCTOR
-GameState::GameState(StateData* stateData, std::string filename)
-	:State(stateData)
+GameState::GameState(StateData* stateData, std::string filename) : State(stateData)
 {
-	this->initVariables();
-	this->initB2World();
-	//this->initB2WorldBounds();
-	this->initContactListener();
-	this->initFont();
-	this->initKeyBinds();
-	this->initPausedMenu();
-	this->initBar();
-	this->initTimer();
-	this->initPaddle();
-	this->initBalls();
-	this->initBackground();
-	this->initLifes();
-	this->initBlockSet(filename);
-	this->initEndGame();
-	this->initSound();
+    this->initVariables();
+    this->initB2World();
 
-
-
+    this->initContactListener();
+    this->initFont();
+    this->initKeyBinds();
+    this->initPausedMenu();
+    this->initBar();
+    this->initTimer();
+    this->initPaddle();
+    this->initBalls();
+    this->initBackground();
+    this->initLives();
+    this->initBlockSet(filename);
+    this->initEndGame();
+    this->initSound();
 }
 GameState::~GameState()
 {
-	delete this->pausedMenu;
-	delete this->inversePaddleBar;
-	delete this->paddle;
-	delete this->timer;
-	for (auto& ball : balls)
-		delete ball;
-	delete this->blockSet;
-	delete this->win;
-	delete this->lose;
-	delete this->world;
-	delete this->contactListener;
-
-	this->stateData->inversePaddle = false;
-	this->stateData->clock.restart();
+    stateData->inversePaddle = false;
+    stateData->inversePaddleElapsed = 0.f;
 }
 
-//ACCESSORS
-std::vector<Ball*> GameState::getBalls()
+const std::vector<std::unique_ptr<Ball>>& GameState::getBalls() const
 {
-	return this->balls;
+    return this->balls;
 }
 
-//FUNCTIONS
-void GameState::updateInput(const float& dt)
+void GameState::updateInput(float dt)
 {
-	//player input
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("CLOSE"))) && this->getKeyTime())
-	{
-		if (!this->paused)
-		{
-			velocityBuffer.clear();
-			for (int i = 0; i < balls.size(); i++)
-			{
-				velocityBuffer.push_back(balls[i]->GetBody()->GetLinearVelocity());
-				// Zatrzymaj cia³o
-				b2Vec2 zeroVelocity(0, 0);
-				balls[i]->GetBody()->SetLinearVelocity(zeroVelocity);
-			}
-
-
-			if (!this->stateData->mute)
-			{
-				this->music.pause();
-			}
-			this->pauseState();
-			this->timer->stop();
-		}
-
-		else
-		{
-			if (!this->stateData->mute)
-			{
-				this->music.play();
-			}
-			this->unpauseState();
-			if (this->startGame)
-				this->timer->resume();
-			for (int i = 0; i < balls.size(); i++)
-			{
-				balls[i]->GetBody()->SetLinearVelocity(velocityBuffer[i]);
-			}
-		}
-	}
-	//MOUSE
-	//if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-	//	this->paddle->GetBody()->SetTransform(b2Vec2(/*this->mousePosWindow.x + this->paddle->getSize().x / 2.f) / SCALE*/0, (this->stateData->gfxSettings->resolution.height - gui::p2pY(9.25f, stateData->gfxSettings->resolution) / SCALE)), 0);
-	
-	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("MOVE_LEFT")))
-		&& !sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("MOVE_RIGHT"))))
-		this->paddleIsMoving = false;
-
-	float  paddleDir = 0;
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("MOVE_LEFT"))))
-	{
-		if (!startGame)
-		{
-			this->startGame = true;
-			if (this->lifeCounter == 3)
-				this->timer->start();
-
-		}
-		if (this->stateData->inversePaddle)
-			paddleDir = 1;
-		else if (!this->stateData->inversePaddle)
-			paddleDir = -1;
-		this->paddleIsMoving = true;
-
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keyBinds.at("MOVE_RIGHT"))))
-	{
-		if (!startGame)
-		{
-			this->startGame = true;
-			if (this->lifeCounter == 3)
-				this->timer->start();
-		}
-		if (stateData->inversePaddle)
-			paddleDir = -1;
-		else if (!this->stateData->inversePaddle)
-			paddleDir = 1;
-		this->paddleIsMoving = true;
-	}
-
-	if(this->paddleIsMoving)
-	{
-		this->paddle->move(paddleDir, 0.f, dt);
-	}
-	else 
-		this->paddle->move(0.f, 0.f, dt);
-		
-	
+    if (stateData->isKeyJustPressed(sf::Keyboard::Key(keyBinds.at("CLOSE"))))
+    {
+        paused = !paused;
+        physicsAccumulator = 0.f;
+        if (paused)
+        {
+            timer->stop();
+            music.pause();
+        }
+        else
+        {
+            if (startGame)
+                timer->resume();
+            if (!stateData->mute)
+                music.play();
+        }
+    }
+    if (paused)
+        return;
+    float direction = 0.f;
+    if (stateData->isKeyPressed(sf::Keyboard::Key(keyBinds.at("MOVE_LEFT"))))
+        direction -= 1.f;
+    if (stateData->isKeyPressed(sf::Keyboard::Key(keyBinds.at("MOVE_RIGHT"))))
+        direction += 1.f;
+    if (direction != 0.f && !startGame)
+    {
+        startGame = true;
+        timer->resume();
+    }
+    paddle->move(stateData->inversePaddle ? -direction : direction, 0.f, dt);
 }
 void GameState::updatePausedButtons()
 {
-	if (this->pausedMenu->isButtonPressed("BACK") && this->getKeyTime())
-	{
-		this->endState();
-	}
-
+    if (this->pausedMenu->isButtonPressed("BACK"))
+    {
+        this->endState();
+    }
 }
 void GameState::updateEndGameButtons()
 {
-	if (this->lose->isButtonPressed("BACK") && this->getKeyTime())
-		this->endState();
-	else if (this->win->isButtonPressed("BACK") && this->getKeyTime())
-		this->endState();
-	else if (this->win->isButtonPressed("NEXT") && this->getKeyTime())
-	{
-		std::cout << "NEXT \n";
-		this->startGame = false;
-		std::string fileName;
-		fileName = this->blockSet->getFileName();
-		fileName.erase(fileName.size() - 5, 5);
-		int numMap = std::stoi(fileName);
-		if (numMap < 16)
-			numMap++;
-		this->stateData->levels[numMap - 1] = 1;
-		this->stateData->refreshLevelState = true;
-		fileName = std::to_string(numMap);
-		fileName += ".slmp";
+    if (livesRemaining == 0)
+    {
+        if (lose->isButtonPressed("BACK"))
+            endState();
+        return;
+    }
+    if (win->isButtonPressed("BACK"))
+    {
+        endState();
+        return;
+    }
+    if (!win->isButtonPressed("NEXT"))
+        return;
+    const int next = levels::next(levels::number(blockSet->getFileName()));
+    if (next == 0)
+    {
+        endState();
+        return;
+    }
 
-		this->world->DestroyBody(this->paddle->GetBody());
-		delete this->paddle;
-		this->initPaddle();
-
-		for(auto& ball : this->balls)
-			this->world->DestroyBody(ball->GetBody());
-		this->balls.clear();
-		this->initBalls();
-
-		this->lifes.clear();
-		this->lifeCounter = 3;
-		this->initLifes();
-
-		delete this->blockSet;
-		this->initBlockSet(fileName);
-
-		delete this->timer;
-		this->initTimer();
-
-		delete this->win;
-		this->initEndGame();
-
-		if(!this->stateData->mute)
-		{
-			this->music.play();
-			this->playMusic = true;
-		}
-
-		
-	}
+    // Load the next map before releasing the previous level.
+    auto nextBlocks = std::make_unique<BlockSet>(stateData, world.get(), levels::filename(next),
+                                                 stateData->gridWidth, stateData->gridHeight);
+    balls.clear();
+    blockSet = std::move(nextBlocks);
+    initPaddle();
+    initBalls();
+    lives.clear();
+    initLives();
+    initTimer();
+    initEndGame();
+    stateData->inversePaddle = false;
+    stateData->inversePaddleElapsed = 0.f;
+    startGame = false;
+    physicsAccumulator = 0.f;
+    playMusic = true;
+    if (!stateData->mute)
+        music.play();
 }
-void GameState::updateEndGame(const float& dt)
+void GameState::updateEndGame(float dt)
 {
-	if (this->lifeCounter < 1)
-	{
-		this->lose->update(this->stateData, this->mousePosWindow, dt);
-		
-		if (!stateData->mute)
-		{
-			this->music.stop();
-			if (this->playMusic)
-			{
-				this->loseSound.play();
-				this->playMusic = false;
-			}
-		}
-		this->updateEndGameButtons();
-	}
-	else if (this->blockSet->checkEndGame())
-	{
-		this->win->update(this->stateData, this->mousePosWindow, dt);
-		std::string fileName;
-		fileName = this->blockSet->getFileName();
-		fileName.erase(fileName.size() - 5, 5);
-		int numMap = std::stoi(fileName);
-		if (numMap < 16)
-			numMap++;
-		this->stateData->levels[numMap - 1] = 1;
-		this->stateData->refreshLevelState = true;
-
-		this->stateData->inversePaddle = false;
-		this->stateData->clock.restart();
-
-		if (!stateData->mute)
-		{
-			this->music.stop();
-			if (this->playMusic)
-			{
-				this->winSound.play();
-				this->playMusic = false;
-			}
-		}
-		this->updateEndGameButtons();
-	}
-
+    const bool won = livesRemaining > 0;
+    timer->stop();
+    if (playMusic)
+    {
+        music.stop();
+        if (!stateData->mute)
+        {
+            if (won)
+                winSound.play();
+            else
+                loseSound.play();
+        }
+        playMusic = false;
+        if (won)
+        {
+            const int next = levels::next(levels::number(blockSet->getFileName()));
+            if (next != 0)
+                stateData->levels[next - 1] = 1;
+            stateData->refreshLevelState = true;
+            stateData->inversePaddle = false;
+            stateData->inversePaddleElapsed = 0.f;
+        }
+    }
+    if (won)
+        win->update(stateData, mousePosWindow, dt);
+    else
+        lose->update(stateData, mousePosWindow, dt);
+    updateEndGameButtons();
 }
-void GameState::updateBlockSet(const float& dt)
+void GameState::updateBlockSet(float dt)
 {
-	this->blockSet->startSuperPower(this->stateData, this->paddle, &this->balls);
-	this->blockSet->collisionBallBlock(this->stateData, this->balls, this->paddle, dt);
+    this->blockSet->startSuperPower(this->stateData, this->paddle.get(), &this->balls);
+    this->blockSet->collisionBallBlock(this->stateData, dt);
 
-	this->blockSet->updateSuperPower(this->stateData, dt);
-	this->blockSet->update();
+    this->blockSet->updateSuperPower(this->stateData, dt);
+    this->blockSet->update();
 }
-void GameState::updateTimer(const float& dt)
+void GameState::updateTimer(float dt)
 {
-	if (this->startGame)
-	{
+    if (this->startGame)
+    {
 
-		if (!this->paused)
-			timer->update(dt);
-	}
-	if (this->lifeCounter < 0)
-	{
-		this->timer->stop();
-	}
-	
+        if (!this->paused)
+            timer->update(dt);
+    }
+    if (this->livesRemaining == 0)
+    {
+        this->timer->stop();
+    }
 }
-void GameState::updateBall(const float& dt)
+void GameState::updateBall(float dt)
 {
-
-	if (this->startGame && this->lifeCounter > 0)
-	{
-		for (int i = 0; i < this->balls.size(); i++)
-		{
-			if (balls[i]->GetBody()->GetLinearVelocity().x == 0 && balls[i]->GetBody()->GetLinearVelocity().y == 0)
-				balls[i]->move(balls[i]->velocity.x, balls[i]->velocity.y, dt);
-			this->balls[i]->update(dt);
-
-
-			if (balls[i]->GetBody()->GetPosition().x * SCALE + balls[i]->getGlobalBounds().width / 2.f >= this->stateData->gfxSettings->resolution.width)
-			{
-				balls[i]->GetBody()->SetTransform(b2Vec2((this->stateData->gfxSettings->resolution.width - balls[i]->getGlobalBounds().width / 2.f) / SCALE, balls[i]->GetBody()->GetPosition().y), 0);
-				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(-balls[i]->GetBody()->GetLinearVelocity().x, balls[i]->GetBody()->GetLinearVelocity().y));
-				if (!stateData->mute)
-					this->collisionSound.play();
-			}
-
-			else if (balls[i]->GetBody()->GetPosition().x * SCALE - balls[i]->getGlobalBounds().width / 2.f <= 0)
-			{
-				balls[i]->GetBody()->SetTransform(b2Vec2(balls[i]->getGlobalBounds().width / 2.f / SCALE, balls[i]->GetBody()->GetPosition().y), 0);
-				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(-balls[i]->GetBody()->GetLinearVelocity().x, balls[i]->GetBody()->GetLinearVelocity().y));
-				if (!stateData->mute)
-					this->collisionSound.play();
-			}
-
-
-			if (balls[i]->GetBody()->GetPosition().y * SCALE - balls[i]->getGlobalBounds().height / 2.f <= 0)
-			{
-				balls[i]->GetBody()->SetTransform(b2Vec2(balls[i]->GetBody()->GetPosition().x, balls[i]->getGlobalBounds().height / 2.f / SCALE), 0);
-				balls[i]->GetBody()->SetLinearVelocity(b2Vec2(balls[i]->GetBody()->GetLinearVelocity().x, -balls[i]->GetBody()->GetLinearVelocity().y));
-				if (!stateData->mute)
-					this->collisionSound.play();
-			}
-
-			
-
-			
-
-			UserData* ballData = (UserData*)balls[i]->GetFixtureDef()->userData.pointer;
-			if (ballData->hit)
-			{
-				if (!this->stateData->mute)
-					this->collisionSound.play();
-
-
-				// Oblicz offset pi³ki od lewego górnego rogu klocka
-				float offsetX = balls[i]->getPosition().x - (paddle->getPosition().x + paddle->getGlobalBounds().width / 2.f);
-
-
-				// Calculate the angle of the ball's bounce
-				float angle = offsetX / paddle->getGlobalBounds().width;
-
-				//// Increase the multiplier for the deflection factor if the ball hits the edge of the block
-				if (offsetX < 0 || offsetX > paddle->getSize().x)
-				{
-					angle *= 2.0f;
-				}
-
-				balls[i]->GetBody()->SetLinearVelocity(
-					b2Vec2(
-						balls[i]->GetBody()->GetLinearVelocity().x + (angle * gui::callCharSize(this->vm, 5)),
-						balls[i]->GetBody()->GetLinearVelocity().y - 1));
-				ballData->hit = false;
-			}
-			
-
-			if (balls[i]->GetBody()->GetPosition().y * SCALE >= this->stateData->gfxSettings->resolution.height)
-			{
-				//REMOVE BALL,
-				if (this->balls.size() >= 1)
-				{
-					world->DestroyBody(balls[i]->GetBody());
-					this->balls.erase(this->balls.begin() + i);
-				}
-				//CHECK LIFES
-				if (this->balls.size() < 1 && this->lifeCounter > 0)
-				{
-					this->lifes.erase(this->lifes.begin() + this->lifeCounter - 1);
-					this->lifeCounter -= 1;
-					this->startGame = false;
-					this->balls.push_back(new Ball(this->stateData, this->world, this->paddle, gui::p2pX(1.4f, this->vm)));
-				}
-			}
-
-
-		}
-
-	}
+    if (!startGame || livesRemaining == 0)
+        return;
+    for (auto& ball : balls)
+    {
+        auto* body = ball->getBody();
+        if (body->GetLinearVelocity().LengthSquared() == 0.f)
+            ball->move(ball->velocity, dt);
+        ball->update(dt);
+        auto position = body->GetPosition();
+        auto velocity = body->GetLinearVelocity();
+        const float radius = ball->getGlobalBounds().width / 2.f / physics::pixelsPerMeter;
+        bool hitWall = false;
+        if (position.x < radius)
+        {
+            position.x = radius;
+            velocity.x = std::abs(velocity.x);
+            hitWall = true;
+        }
+        if (position.x > vm.width / physics::pixelsPerMeter - radius)
+        {
+            position.x = vm.width / physics::pixelsPerMeter - radius;
+            velocity.x = -std::abs(velocity.x);
+            hitWall = true;
+        }
+        if (position.y < radius)
+        {
+            position.y = radius;
+            velocity.y = std::abs(velocity.y);
+            hitWall = true;
+        }
+        if (hitWall)
+        {
+            body->SetTransform(position, body->GetAngle());
+            body->SetLinearVelocity(velocity);
+            if (!stateData->mute)
+                collisionSound.play();
+        }
+        auto* contact = reinterpret_cast<UserData*>(ball->getFixtureDefinition()->userData.pointer);
+        if (contact->hit)
+        {
+            const float halfWidth = paddle->getSize().x / 2.f;
+            const float offset =
+                (body->GetPosition().x * physics::pixelsPerMeter - paddle->getPosition().x - halfWidth) /
+                halfWidth;
+            const float angle = std::clamp(offset, -1.f, 1.f) * b2_pi / 3.f;
+            const float speed = std::max(body->GetLinearVelocity().Length(), 1.f);
+            body->SetLinearVelocity(b2Vec2(std::sin(angle) * speed, -std::cos(angle) * speed));
+            contact->hit = false;
+            if (!stateData->mute)
+                collisionSound.play();
+        }
+    }
+    balls.erase(
+        std::remove_if(balls.begin(), balls.end(), [&](const auto& ball)
+                       { return ball->getBody()->GetPosition().y * physics::pixelsPerMeter >= vm.height; }),
+        balls.end());
+    if (balls.empty())
+    {
+        --livesRemaining;
+        if (!lives.empty())
+            lives.pop_back();
+        startGame = false;
+        if (livesRemaining > 0)
+            initBalls();
+    }
 }
-void GameState::updateInverseTimer()
+void GameState::updateInverseTimer(float dt)
 {
-	if (this->stateData->inversePaddle)
-	{
-		if (this->stateData->clock.getElapsedTime().asSeconds() >= 10)
-		{
-			this->stateData->inversePaddle = false;
-			this->stateData->clock.restart();
-		}
-	}
-	this->inversePaddleBar->update("INVERSE PADDLE TIME", this->stateData->clock.getElapsedTime().asSeconds());
+    if (stateData->inversePaddle)
+    {
+        stateData->inversePaddleElapsed += dt;
+        if (stateData->inversePaddleElapsed >= gameConfig::inversePaddleDuration)
+        {
+            stateData->inversePaddle = false;
+            stateData->inversePaddleElapsed = 0.f;
+        }
+    }
+    inversePaddleBar->update("INVERSE PADDLE TIME", stateData->inversePaddleElapsed);
 }
-void GameState::update(const float& dt)
+void GameState::update(float dt)
 {
-	this->world->Step(1 / 60.f / s, 8, 3);
-	this->updateMousePosition();
-	if(!this->blockSet->checkEndGame() && this->lifeCounter > 0)
-	{
-		this->updateInput(dt);
-		this->updateTimer(dt);
-
-		if (this->paused)
-		{
-			this->pausedMenu->update(this->stateData, this->mousePosWindow);
-			this->updatePausedButtons();
-		}
-		else
-		{
-			this->updateBall(dt);
-			this->paddle->update(dt);
-			this->updateInverseTimer();
-			this->updateBlockSet(dt);
-		}
-	}
-	else
-	{
-		this->updateEndGame(dt);
-		this->updateEndGameButtons();
-	}
-	
-} 
+    updateMousePosition();
+    if (livesRemaining == 0 || blockSet->checkEndGame())
+    {
+        updateEndGame(dt);
+        return;
+    }
+    updateInput(dt);
+    if (paused)
+    {
+        pausedMenu->update(stateData, mousePosWindow);
+        updatePausedButtons();
+        return;
+    }
+    if (!startGame)
+        return;
+    physicsAccumulator += std::min(dt, physics::maxFrameTime);
+    while (physicsAccumulator + 1e-7f >= physics::fixedTimeStep)
+    {
+        const float step = physics::fixedTimeStep;
+        // Keep the original game speed while decoupling simulation from rendering.
+        world->Step(step, 8, 3);
+        physicsAccumulator = std::max(0.f, physicsAccumulator - step);
+        paddle->update(step);
+        updateBall(step);
+        updateBlockSet(step);
+        updateInverseTimer(step);
+        updateTimer(step);
+        if (livesRemaining == 0 || blockSet->checkEndGame() || !startGame)
+            break;
+    }
+}
 void GameState::renderEndGame(sf::RenderTarget* target)
 {
-		if (lifeCounter < 1)
-		{
-			this->timer->stop();
-			this->timer->setCharacterSize(70);
-			this->lose->render(target);
-		}
-		else if (this->blockSet->checkEndGame())
-		{
-			this->timer->stop();
-			this->timer->setCharacterSize(70);
-			this->win->render(target);
-
-		}
+    if (livesRemaining < 1)
+    {
+        this->timer->stop();
+        this->timer->setCharacterSize(70);
+        this->lose->render(target);
+    }
+    else if (this->blockSet->checkEndGame())
+    {
+        this->timer->stop();
+        this->timer->setCharacterSize(70);
+        this->win->render(target);
+    }
 }
 void GameState::renderBalls(sf::RenderTarget* target)
 {
-	for (auto& ball : this->balls)
-	{
-		ball->render(target);
-	}
+    for (auto& ball : this->balls)
+    {
+        ball->render(target);
+    }
 }
-void GameState::renderLifes(sf::RenderTarget* target)
+void GameState::renderLives(sf::RenderTarget* target)
 {
-	for (auto& life : this->lifes)
-	{
-		target->draw(life);
-	}
+    for (auto& life : this->lives)
+    {
+        target->draw(life);
+    }
 }
 void GameState::render(sf::RenderTarget* target)
 {
-	
 
-	target->draw(this->background);
+    target->draw(this->background);
 
-	this->blockSet->render(*target);
-	if(this->stateData->inversePaddle)
-		this->inversePaddleBar->render(*target);
-	this->paddle->render(target);
-	this->renderBalls(target);
-	this->renderEndGame(target);
-	this->timer->render(*target);
-	this->renderLifes(target);
+    this->blockSet->render(*target);
+    if (this->stateData->inversePaddle)
+        this->inversePaddleBar->render(*target);
+    this->paddle->render(target);
+    this->renderBalls(target);
+    this->renderEndGame(target);
+    this->timer->render(*target);
+    this->renderLives(target);
 
-
-	if (this->paused)
-	{
-		this->pausedMenu->render(*target);
-	}
+    if (this->paused)
+    {
+        this->pausedMenu->render(*target);
+    }
 }
-
-

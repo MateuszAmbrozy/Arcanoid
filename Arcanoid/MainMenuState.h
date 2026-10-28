@@ -1,21 +1,20 @@
 #pragma once
-#include "State.h"
-#include "Gui.h"
-#include "GameState.h"
-#include "LevelState.h"
 #include "EditorState.h"
+#include "GameState.h"
+#include "Gui.h"
+#include "LevelState.h"
 #include "SettingsState.h"
-class MainMenuState :
-    public State
+#include "State.h"
+#include "stdafx.h"
+class MainMenuState : public State
 {
-private:
-    //VARIABLES
+  private:
     sf::RectangleShape background;
     sf::Texture texture;
     sf::Sprite sprite;
     sf::Font font;
 
-    std::map <std::string, gui::Button*> buttons;
+    std::map<std::string, std::unique_ptr<gui::Button>> buttons;
     sf::VideoMode vm;
 
     sf::Texture muteTexture;
@@ -23,24 +22,21 @@ private:
     sf::Sprite mute;
     sf::Sprite unmute;
 
-    //PRIVATE FUNCTIONS
     void initMute();
     void initVariables();
     void initKeyBinds();
     void initFont();
     void initGUI();
-public:
-    //CONSTRUCTOR AND DESTRUCTOR
-    MainMenuState(StateData* stateData);
-    virtual ~MainMenuState();
 
-    //FUNCSTIONS
+  public:
+    MainMenuState(StateData* stateData);
+    ~MainMenuState() override;
+
     void resetGUI();
     void updateButtons();
-    void updateInput(const float& dt);
+    void updateInput(float dt) override;
     void updateMute();
-    void update(const float& dt);
+    void update(float dt) override;
     void renderButtons(sf::RenderTarget& target);
-    void render(sf::RenderTarget* target = nullptr);
+    void render(sf::RenderTarget* target = nullptr) override;
 };
-

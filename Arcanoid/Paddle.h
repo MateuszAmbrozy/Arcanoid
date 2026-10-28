@@ -1,56 +1,52 @@
 #pragma once
-#include "State.h"
 #include "Gui.h"
 #include "ObjectData.h"
+#include "State.h"
+#include "stdafx.h"
 class Paddle
 {
-private:
-	sf::Texture texture;
-	sf::IntRect textureRect;
-	sf::RectangleShape shape;
-	float width;
-	float height;
-	sf::VideoMode vm;
-	sf::Vector2f position;
-	float maxVelocity;
+  private:
+    sf::Texture texture;
+    sf::IntRect textureRect;
+    sf::RectangleShape shape;
+    float width;
+    float height;
+    sf::VideoMode vm;
+    sf::Vector2f position;
+    float maxVelocity;
 
-	//box2d variables
-	b2Body* m_body;
-	b2BodyDef* m_bodyDef;
-	b2Shape* m_shape;
-	b2FixtureDef* m_fixtureDef;
-	UserData* userData;
-	
-	void initTexture(StateData* stateData);
-	void initBox2D(b2World* world);
+    b2World* ownerWorld = nullptr;
+    b2Body* m_body = nullptr;
+    b2BodyDef m_bodyDef{};
+    b2PolygonShape m_shape{};
+    b2FixtureDef m_fixtureDef{};
+    UserData userData{};
 
-public:
-	//CONSTRUCTOR AND DESTRUCTOR
-	Paddle(StateData* stateData, b2World* world);
-	virtual ~Paddle();
+    void initTexture(StateData* stateData);
+    void initBox2D(b2World* world);
 
-	//ACCESSORS
-	const sf::Vector2f getPosition() const;
-	const sf::FloatRect getGlobalBounds() const;
-	const sf::Vector2f getSize() const;
+  public:
+    Paddle(StateData* stateData, b2World* world);
+    ~Paddle();
+    Paddle(const Paddle&) = delete;
+    Paddle& operator=(const Paddle&) = delete;
 
-	//box2d accessors
-	b2BodyDef* GetBodyDef();
-	b2Body* GetBody();
-	b2FixtureDef* GetFixtureDef();
+    sf::Vector2f getPosition() const;
+    sf::FloatRect getGlobalBounds() const;
+    sf::Vector2f getSize() const;
 
-	//MODIFIERS
-	void setPosition(sf::Vector2f position);
-	void biggerPaddle();
-	void smallerPaddle();
+    b2BodyDef* getBodyDefinition();
+    b2Body* getBody();
+    b2FixtureDef* getFixtureDefinition();
 
-	//box2d modifiers
-	void setBodySize();
+    void setPosition(sf::Vector2f position);
+    void biggerPaddle();
+    void smallerPaddle();
 
-	//FUNCTIONS
-	void move(const float dirX, const float dirY, const float& dt);
-	void updateWorldBoundsCollision();
-	void update(const float& dt);
-	void render(sf::RenderTarget* target);
+    void setBodySize();
+
+    void move(const float dirX, const float dirY, float dt);
+    void updateWorldBoundsCollision();
+    void update(float dt);
+    void render(sf::RenderTarget* target);
 };
-
